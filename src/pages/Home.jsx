@@ -207,40 +207,46 @@ const Home = () => {
     }
   }, [activeSection, hasCounted]);
 
-  const handleFormSubmit = async (e) => {
-  e.preventDefault();
-  
-  const token = recaptchaRef.current?.getValue();
-  if (!token) {
-    alert("Please complete the reCAPTCHA verification.");
-    return;
-  }
+const handleFormSubmit = async (e) => {
+    e.preventDefault();
 
-  const formData = {
-    firstName: e.target.firstName.value,
-    lastName: e.target.lastName.value,
-    email: e.target.email.value,
-    message: e.target.message.value,
-    recaptchaToken: token,
+    const token = recaptchaRef.current?.getValue();
+    if (!token) {
+      alert("Please complete the reCAPTCHA verification.");
+      return;
+    }
+
+    const payload = {
+      firstName: e.target.firstName.value,
+      lastName: e.target.lastName.value,
+      email: e.target.email.value,
+      message: e.target.message.value,
+    };
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.error || `Server responded with status ${res.status}`);
+      }
+
+      alert("Message sent! We will be in touch soon.");
+      e.target.reset();
+      recaptchaRef.current?.reset();
+    } catch (err) {
+      console.error("Form submission error:", err);
+      alert(`Submission failed: ${err.message}`);
+    }
   };
-
-  try {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-
-    if (!res.ok) throw new Error('Submission failed');
-
-    alert("Message sent! We will be in touch soon.");
-    e.target.reset();
-    recaptchaRef.current?.reset();
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send message. Please try again.");
-  }
-};
 
   const maroon = "#972037";
   const anniversaryGraphic = "/33-years-service-graphic.png";

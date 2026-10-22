@@ -603,6 +603,10 @@ const handleFormSubmit = async (e) => {
             <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-600 leading-relaxed">
               Petrotek provides specialized technical and logistics services to solve complex subsurface challenges across North America and beyond.
             </p>
+            <br></br>
+            <p className="text-sm sm:text-base text-gray-500 italic mb-12">
+              Professional engineering and geology services offered where licensed *
+          </p>
           </div>
 
           {/* Stats Display */}

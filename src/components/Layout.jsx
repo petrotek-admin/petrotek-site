@@ -24,7 +24,7 @@ const ImageModal = ({ src, alt, isOpen, onClose }) => {
       setScale(1);
       setPosition({ x: 0, y: 0 });
     }
-  }, [src, isOpen]);
+  }, [src, isOpen]); 
 
   // Non-passive desktop trackpad & mouse wheel listener
   useEffect(() => {

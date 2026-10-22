@@ -3,8 +3,6 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 
-export default App;
-
 // Layout & Helpers
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
@@ -27,25 +25,22 @@ const App = () => {
     <>
       <ScrollToTop />
       <Routes>
-        {/* The Layout wraps all routes, giving them the Navbar & Footer */}
+        {/* The Layout wraps all routes, providing the Navbar & Footer */}
         <Route path="/" element={<Layout />}>
-          
           <Route index element={<Home />} />
           <Route path="team" element={<Team />} />
           <Route path="publications" element={<Publications />} />
 
           {/* Service Routes */}
-          {/* You can choose to make these /services/mining or just /mining */}
           <Route path="injection-wells" element={<InjectionWells />} />
-          <Route path="/leachate-services" element={<Leachate />} />
+          <Route path="leachate-services" element={<Leachate />} />
           <Route path="carbon-capture" element={<CaptureStorage />} />
           <Route path="oil-and-gas" element={<OilGas />} />
-          <Route path="/mining-and-isr" element={<MiningAndISR />} />
+          <Route path="mining-and-isr" element={<MiningAndISR />} />
           <Route path="safety" element={<Safety />} />
-
         </Route>
       </Routes>
-       <Analytics />
+      <Analytics />
     </>
   );
 };

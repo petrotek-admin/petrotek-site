@@ -1,6 +1,9 @@
 // src/App.jsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
+
+export default App;
 
 // Layout & Helpers
 import Layout from './components/Layout';
@@ -42,6 +45,7 @@ const App = () => {
 
         </Route>
       </Routes>
+       <Analytics />
     </>
   );
 };

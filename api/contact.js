@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   try {
     const data = await resend.emails.send({
-      from: 'Petrotek Inquiries <contact@petrotek.com>', // Or your verified domain
+      from: 'Petrotek Inquiries <cjmax88@gmail.com>', // Or your verified domain
       to: ['cjmax88@gmail.com'],
       reply_to: email,
       subject: `New Inquiry from ${firstName} ${lastName}`,

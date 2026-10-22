@@ -4,6 +4,18 @@ import App from './App.jsx'
 import './index.css'
 // 1. Import HashRouter instead of BrowserRouter
 import { BrowserRouter } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react';
+
+function App() {
+  return (
+    <>
+      {/* Existing application routes & components */}
+      <Analytics />
+    </>
+  );
+}
+
+export default App;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

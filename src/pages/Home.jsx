@@ -704,19 +704,19 @@ const handleFormSubmit = async (e) => {
                 <div className="p-6 sm:p-8 space-y-5 text-sm sm:text-base">
                   <div className="flex items-start space-x-3.5">
                     <MapPin className="w-5 h-5 mt-1 shrink-0" />
-                    <p className="leading-relaxed">5935 South Zang Street, Suite 200<br />Littleton, Colorado USA 80127</p>
+                    <p className="leading-relaxed">5935 South Zang Street, Suite 200 Littleton, Colorado USA 80127</p>
                   </div>
 
                   <div className="flex items-center space-x-3.5">
                     <Phone className="w-5 h-5 shrink-0" />
-                    <p><a href="tel:3032909414" className="hover:underline font-semibold">(303) 290-9414</a></p>
+                    <p><a href="tel:3032909414" className="hover:underline">(303) 290-9414</a></p>
                   </div>
 
                   {/* Form Indicator with Directional Arrow */}
                   <div className="flex items-start space-x-3.5 group">
                     <Mail className="w-5 h-5 mt-0.5 shrink-0" />
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-medium text-white/95">
+                      <span>
                         Send us a message using our contact form
                       </span>
                       <span className="inline-flex items-center text-white drop-shadow-sm">

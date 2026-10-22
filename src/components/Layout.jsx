@@ -245,7 +245,7 @@ const Layout = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
-  const maroon = "#8B1E3F";
+  const maroon = "#972037";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -306,7 +306,7 @@ const Layout = () => {
   const linkClass = (isMobile = false) => `
     text-sm font-bold uppercase tracking-widest transition-all duration-300
     [@media(min-width:1600px)]:text-base
-    ${isMobile ? 'text-gray-800 text-xl py-6 border-b border-gray-100' : 'text-gray-800 hover:text-[#8B1E3F]'}
+    ${isMobile ? 'text-gray-800 text-xl py-6 border-b border-gray-100' : 'text-gray-800 hover:text-[#972037]'}
   `;
 
   return (
@@ -331,7 +331,7 @@ const Layout = () => {
               {isDropdownOpen && (
                 <div className="absolute top-full left-0 w-64 [@media(min-width:1600px)]:w-80 bg-white shadow-2xl rounded-xl py-4 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                   {services.map((s) => (
-                    <Link key={s.id} to={s.id} onClick={() => window.scrollTo(0,0)} className="px-6 py-3 hover:bg-gray-50 text-gray-700 text-xs [@media(min-width:1600px)]:text-sm font-bold uppercase tracking-widest hover:text-[#8B1E3F] transition-colors block">
+                    <Link key={s.id} to={s.id} onClick={() => window.scrollTo(0,0)} className="px-6 py-3 hover:bg-gray-50 text-gray-700 text-xs [@media(min-width:1600px)]:text-sm font-bold uppercase tracking-widest hover:text-[#972037] transition-colors block">
                       {s.title}
                     </Link>
                   ))}
@@ -385,7 +385,7 @@ const Layout = () => {
               <Link 
                 to="/" 
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#8B1E3F] transition-colors"
+                className="flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#972037] transition-colors"
               >
                 <span>Home</span>
               </Link>
@@ -395,12 +395,12 @@ const Layout = () => {
                 <button
                   type="button"
                   onClick={() => setIsServicesExpanded(!isServicesExpanded)}
-                  className="w-full flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#8B1E3F] transition-colors"
+                  className="w-full flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#972037] transition-colors"
                 >
                   <span>Our Services</span>
                   <ChevronDown 
                     size={20} 
-                    className={`text-gray-400 transition-transform duration-300 ${isServicesExpanded ? 'rotate-180 text-[#8B1E3F]' : ''}`} 
+                    className={`text-gray-400 transition-transform duration-300 ${isServicesExpanded ? 'rotate-180 text-[#972037]' : ''}`} 
                   />
                 </button>
 
@@ -409,13 +409,13 @@ const Layout = () => {
                     isServicesExpanded ? 'max-h-96 opacity-100 pb-3' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <div className="grid grid-cols-1 gap-1 pl-3 border-l-2 border-[#8B1E3F]/20 ml-1">
+                  <div className="grid grid-cols-1 gap-1 pl-3 border-l-2 border-[#972037]/20 ml-1">
                     {services.map((s) => (
                       <Link 
                         key={s.id} 
                         to={s.id} 
                         onClick={() => setIsMenuOpen(false)}
-                        className="py-2 px-3 text-sm font-semibold tracking-wide text-gray-600 hover:text-[#8B1E3F] hover:bg-gray-50 rounded-lg transition-all"
+                        className="py-2 px-3 text-sm font-semibold tracking-wide text-gray-600 hover:text-[#972037] hover:bg-gray-50 rounded-lg transition-all"
                       >
                         {s.title}
                       </Link>
@@ -427,7 +427,7 @@ const Layout = () => {
               <Link 
                 to="/team" 
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#8B1E3F] transition-colors"
+                className="flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#972037] transition-colors"
               >
                 <span>Our Team</span>
               </Link>
@@ -435,7 +435,7 @@ const Layout = () => {
               <Link 
                 to="/publications" 
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#8B1E3F] transition-colors"
+                className="flex items-center justify-between py-3.5 text-xl font-bold tracking-tight text-gray-900 hover:text-[#972037] transition-colors"
               >
                 <span>Publications</span>
               </Link>
@@ -445,13 +445,13 @@ const Layout = () => {
             <div className="mt-8 pt-6 border-t border-gray-100 space-y-4">
               <div className="space-y-2 text-xs text-gray-500">
                 <div className="flex items-center gap-2">
-                  <Phone size={14} className="text-[#8B1E3F]" />
+                  <Phone size={14} className="text-[#972037]" />
                   <a href="tel:3032909414" className="hover:underline font-semibold text-gray-700">
                     (303) 290-9414
                   </a>
                 </div>
                 <div className="flex items-start gap-2">
-                  <MapPin size={14} className="text-[#8B1E3F] shrink-0 mt-0.5" />
+                  <MapPin size={14} className="text-[#972037] shrink-0 mt-0.5" />
                   <span>5935 S Zang St, Suite 200, Littleton, CO</span>
                 </div>
               </div>
@@ -480,10 +480,10 @@ const Layout = () => {
             <div className="flex flex-col items-start">
               <img src="/Petrotek.png" alt="Petrotek" className="h-12 w-auto brightness-125 mb-8 no-zoom" />
               <p className="text-base md:text-lg leading-relaxed max-w-sm mb-8 text-gray-300">
-                Petrotek Corporation specializes in engineering evaluation and field operations for subsurface fluid flow.
+                Petrotek Corporation specializes in technical evaluations and field operations related to subsurface fluid flow.
               </p>
               <div className="flex items-center space-x-3 text-sm md:text-base font-bold uppercase tracking-widest text-gray-400">
-                <div className="h-px w-8 bg-[#8B1E3F]"></div>
+                <div className="h-px w-8 bg-[#972037]"></div>
                 <span>Established 1993</span>
               </div>
             </div>
@@ -511,11 +511,11 @@ const Layout = () => {
               <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-8 opacity-70">Headquarters</h4>
               <div className="text-base md:text-lg space-y-6">
                 <div className="flex items-start space-x-3">
-                  <MapPin size={22} className="text-[#8B1E3F] shrink-0 mt-1" />
+                  <MapPin size={22} className="text-[#972037] shrink-0 mt-1" />
                   <span className="text-gray-300">5935 South Zang Street, Suite 200<br />Littleton, Colorado USA 80127</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Phone size={22} className="text-[#8B1E3F] shrink-0" />
+                  <Phone size={22} className="text-[#972037] shrink-0" />
                   <a href="tel:3032909414" className="hover:text-white transition-colors text-gray-300">(303) 290-9414</a>
                 </div>
               </div>
@@ -524,7 +524,7 @@ const Layout = () => {
           </div>
           
           <div className="pt-12 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-            <p className="text-xs md:text-sm uppercase tracking-widest text-gray-400">&copy; {new Date().getFullYear()} Petrotek Engineering Corporation</p>
+            <p className="text-xs md:text-sm uppercase tracking-widest text-gray-400">&copy; {new Date().getFullYear()} Petrotek Corporation</p>
             <p className="text-xs md:text-sm font-bold text-white uppercase tracking-[0.2em] italic opacity-80">Building Relationships | Solving Problems | Adding Value</p>
           </div>
         </div>

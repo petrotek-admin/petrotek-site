@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 const OurTeam = () => {
-  const maroon = "#8B1E3F";
+  const maroon = "#972037";
   // Logic: searchTerm state has been removed
   const [selectedMember, setSelectedMember] = useState(null);
   const [showCredits, setShowCredits] = useState(false);
@@ -61,10 +61,16 @@ const OurTeam = () => {
     },
     {
       name: "Ken Cooper, M.S., P.E.",
-      role: "Principal, Engineering Manager/Senior Engineer",
+      role: "Founder, Principal, Engineering Manager/Senior Engineer",
       education: "B.S. Petroleum Engineering, Montana College of Mineral Science and Technology; M.S. Petroleum Engineering, Montana Tech of the University of Montana",
       tags: ["Engineering", "Reservoir Simulation", "Well Feasibility", "Expert Witness"],
-      bio: "Ken Cooper is one of the managing principals of Petrotek and serves as the Director of Engineering. Prior to helping found Petrotek in 1993, he gained engineering experience working in the petroleum industry and for petroleum/uranium/injection well consultancies. Ken has more than 35 years of experience working with all classes of injection wells and specializes in investigating well feasibility, reservoir issues and testing, reservoir simulation, well compliance and permitting, along with optimizing injection well operation and maintenance. Ken has published and given a variety of talks and short-courses regarding subsurface injection, pressure transient well testing, and the simulation of subsurface fluid flow over the years, and provides expert witness testimony regarding well permitting, subsurface resources and injection wells. He is a board member of the GWREF and UITC, and has been an active member of both the GWPC (formerly the UIPC) and the Society of Petroleum Engineers (SPE) since the 1980s.",
+      bio: (
+      <>
+        <p>Ken is one of the managing principals of Petrotek and serves as the Director of Engineering. He holds degrees in Petroleum Engineering and is a registered professional engineer in numerous states.  Prior to helping found Petrotek in 1993, he gained engineering experience working in the petroleum industry and for petroleum/uranium/injection well consultancies. Ken has more than 40 years of experience working with all classes of injection wells and specializes in investigating well feasibility, reservoir issues and testing, reservoir simulation, subsurface pore space and correlative rights, well compliance and permitting, along with optimizing injection well operation and maintenance.   In addition to his experience with natural resource extraction consulting, he has managed the successful operation of injection wells and has been involved with providing services regarding every facet of injection well technology for projects around the country.</p> 
+        <br></br>
+        <p>Ken has regularly published and given a wide variety of talks and short-courses regarding subsurface injection, regulatory compliance, pressure transient well testing, and the simulation of subsurface fluid flow over the years, and provides expert witness testimony regarding well permitting, subsurface resources, and injection wells. He is a board member of the GWREF and UITC, and has been an active member of both the GWPC (formerly the UIPC) and the Society of Petroleum Engineers (SPE) since the 1980s.</p>
+      </>
+      ),
       personal: "Outside of work, Ken likes spending time with his wife, hiking, four-wheeling, an occasional good craft beer, and traveling. He hopes one day to have visited all seven continents."
     },
     {
@@ -218,7 +224,7 @@ const OurTeam = () => {
       <div className="container mx-auto max-w-8xl">
         
         {/* Navigation */}
-        <Link to="/" className="flex items-center text-[#8B1E3F] font-bold mb-8 hover:underline group w-fit">
+        <Link to="/" className="flex items-center text-[#972037] font-bold mb-8 hover:underline group w-fit">
           <ArrowRight className="rotate-180 w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
         </Link>
 
@@ -244,7 +250,7 @@ const OurTeam = () => {
                 key={idx} 
                 className={`relative rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col ${
                   isPrincipal
-                    ? 'border-2 border-[#8B1E3F] bg-[#8B1E3F]/[0.02] shadow-[#8B1E3F]/5'
+                    ? 'border-2 border-[#972037] bg-[#972037]/[0.02] shadow-[#972037]/5'
                     : 'bg-white border border-gray-100 hover:border-gray-300'
                 }`}
                 onClick={() => setSelectedMember(member)}
@@ -252,22 +258,22 @@ const OurTeam = () => {
                 {/* Principal Leadership Badge */}
                 {isPrincipal && (
                   <div className="absolute top-4 right-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#8B1E3F] text-white shadow-sm">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#972037] text-white shadow-sm">
                       Principal
                     </span>
                   </div>
                 )}
 
                 <div className="flex-grow">
-                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#8B1E3F] transition-colors mb-1 pr-16">
+                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#972037] transition-colors mb-1 pr-16">
                     {member.name}
                   </h3>
-                  <p className="text-xs font-bold text-[#8B1E3F] mb-4 uppercase tracking-wider">
+                  <p className="text-xs font-bold text-[#972037] mb-4 uppercase tracking-wider">
                     {member.role}
                   </p>
                   
                   <div className="flex items-center text-[11px] text-gray-500 mb-6 font-medium">
-                    <GraduationCap className="w-3.5 h-3.5 mr-2 shrink-0 text-[#8B1E3F]" />
+                    <GraduationCap className="w-3.5 h-3.5 mr-2 shrink-0 text-[#972037]" />
                     {member.education}
                   </div>
 
@@ -277,7 +283,7 @@ const OurTeam = () => {
                         key={tag} 
                         className={`px-2 py-0.5 text-[10px] font-bold rounded border ${
                           isPrincipal 
-                            ? 'bg-white text-gray-700 border-[#8B1E3F]/20' 
+                            ? 'bg-white text-gray-700 border-[#972037]/20' 
                             : 'bg-gray-50 text-gray-500 border-gray-100'
                         }`}
                       >
@@ -287,7 +293,7 @@ const OurTeam = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center text-[10px] font-bold text-[#8B1E3F] uppercase tracking-[0.2em] pt-4 border-t border-gray-100 mt-auto">
+                <div className="flex items-center text-[10px] font-bold text-[#972037] uppercase tracking-[0.2em] pt-4 border-t border-gray-100 mt-auto">
                   Read Professional Bio <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -300,16 +306,16 @@ const OurTeam = () => {
               className="w-full max-w-lg bg-gray-50 border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all cursor-pointer group flex flex-col items-center justify-center text-center"
               onClick={() => setShowCredits(true)}
             >
-              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-4 group-hover:bg-[#8B1E3F] transition-colors">
+              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-4 group-hover:bg-[#972037] transition-colors">
                 <History className="w-6 h-6 text-gray-500 group-hover:text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#8B1E3F] transition-colors mb-2">
+              <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#972037] transition-colors mb-2">
                 Historical Credits & Thanks
               </h3>
               <p className="text-sm text-gray-500">
                 Honoring our founders and past staff members who contributed to Petrotek's success.
               </p>
-              <div className="flex items-center text-[10px] font-bold text-[#8B1E3F] uppercase tracking-[0.2em] mt-6">
+              <div className="flex items-center text-[10px] font-bold text-[#972037] uppercase tracking-[0.2em] mt-6">
                 Read Acknowledgements <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -318,27 +324,38 @@ const OurTeam = () => {
 
         {/* Bio Modal Overlay */}
         {selectedMember && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
-            <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="p-8 md:p-12 relative max-h-[90vh] overflow-y-auto">
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setSelectedMember(null)}
+          >
+            <div 
+              className="relative bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in fade-in slide-in-from-bottom-4 duration-300"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Sticky Close Button Header */}
+              <div className="sticky top-0 z-20 flex justify-end p-4 pointer-events-none">
                 <button 
                   onClick={() => setSelectedMember(null)}
-                  className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Close modal"
+                  className="pointer-events-auto p-2 bg-white/90 hover:bg-gray-100 rounded-full transition-all shadow-sm border border-gray-100/80 hover:text-gray-700"
                 >
-                  <X className="w-6 h-6 text-gray-400" />
+                  <X className="w-6 h-6 text-gray-500" />
                 </button>
+              </div>
 
-                <div className="mb-8 border-b border-gray-100 pb-6">
+              {/* Modal Body Content */}
+              <div className="px-8 pb-8 md:px-12 md:pb-12 -mt-12">
+                <div className="mb-8 border-b border-gray-100 pb-6 pr-10">
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedMember.name}</h2>
-                  <p className="text-xl text-[#8B1E3F] font-bold">{selectedMember.role}</p>
+                  <p className="text-xl text-[#972037] font-bold">{selectedMember.role}</p>
                   <div className="flex items-center mt-4 text-gray-500 font-medium">
-                    <GraduationCap className="w-5 h-5 mr-3 shrink-0 text-[#8B1E3F]" />
+                    <GraduationCap className="w-5 h-5 mr-3 shrink-0 text-[#972037]" />
                     {selectedMember.education}
                   </div>
                 </div>
 
                 <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
-                  <p>{selectedMember.bio}</p>
+                  <div>{selectedMember.bio}</div>
                   
                   {selectedMember.personal && (
                     <div className="bg-gray-50 p-6 rounded-2xl border-l-8" style={{ borderColor: maroon }}>
@@ -364,27 +381,32 @@ const OurTeam = () => {
           </div>
         )}
 
-        {/* NEW: Historical Credits Modal Overlay */}
+        {/* Historical Credits Modal Overlay */}
         {showCredits && (
           <div 
             className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity"
             onClick={() => setShowCredits(false)}
           >
             <div 
-              className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300"
-              onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing
+              className="relative bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in fade-in slide-in-from-bottom-4 duration-300"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-8 md:p-12 relative max-h-[90vh] overflow-y-auto">
+              {/* Sticky Close Button Header */}
+              <div className="sticky top-0 z-20 flex justify-end p-4 pointer-events-none">
                 <button 
                   onClick={() => setShowCredits(false)}
-                  className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Close modal"
+                  className="pointer-events-auto p-2 bg-white/90 hover:bg-gray-100 rounded-full transition-all shadow-sm border border-gray-100/80 hover:text-gray-700"
                 >
-                  <X className="w-6 h-6 text-gray-400" />
+                  <X className="w-6 h-6 text-gray-500" />
                 </button>
+              </div>
 
-                <div className="mb-8 border-b border-gray-100 pb-6">
+              {/* Modal Body Content */}
+              <div className="px-8 pb-8 md:px-12 md:pb-12 -mt-12">
+                <div className="mb-8 border-b border-gray-100 pb-6 pr-10">
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Historical Credits and Thanks</h2>
-                  <p className="text-xl text-[#8B1E3F] font-bold">Honoring Our Past</p>
+                  <p className="text-xl text-[#972037] font-bold">Honoring Our Past</p>
                 </div>
 
                 <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
@@ -426,7 +448,7 @@ const OurTeam = () => {
           <Link 
             to="/" 
             onClick={() => setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100)}
-            className="px-8 py-4 bg-[#8B1E3F] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg shrink-0"
+            className="px-8 py-4 bg-[#972037] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg shrink-0"
           >
             Contact a Specialist
           </Link>
@@ -436,7 +458,7 @@ const OurTeam = () => {
           <button
             onClick={scrollToTop}
             aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#8B1E3F] hover:brightness-110 ${
+            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
               showTopBtn 
                 ? 'opacity-100 translate-y-0 pointer-events-auto' 
                 : 'opacity-0 translate-y-4 pointer-events-none'

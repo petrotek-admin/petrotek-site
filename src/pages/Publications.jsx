@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const Publications = () => {
-  const maroon = "#8B1E3F";
+  const maroon = "#972037";
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   
@@ -439,7 +439,7 @@ const Publications = () => {
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
       <div className="container mx-auto max-w-8xl">
-        <Link to="/" className="flex items-center text-[#8B1E3F] font-bold mb-8 hover:underline group w-fit">
+        <Link to="/" className="flex items-center text-[#972037] font-bold mb-8 hover:underline group w-fit">
           <ArrowRight className="rotate-180 w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
         </Link>
 
@@ -454,7 +454,7 @@ const Publications = () => {
           <div className="flex items-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300 w-full sm:w-fit">
             <Mail className="w-5 h-5 mr-3" style={{ color: maroon }} />
             <span className="text-sm font-medium text-gray-700">
-              Please <Link to="/" onClick={() => setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100)} className="text-[#8B1E3F] font-bold hover:underline">contact us</Link> to request a copy of any publication.
+              Please <Link to="/" onClick={() => setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100)} className="text-[#972037] font-bold hover:underline">contact us</Link> to request a copy of any publication.
             </span>
           </div>
         </div>
@@ -468,7 +468,7 @@ const Publications = () => {
               <input 
                 type="text" 
                 placeholder="Search by title or author..."
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#8B1E3F] outline-none text-sm"
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#972037] outline-none text-sm"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
@@ -480,8 +480,8 @@ const Publications = () => {
                   onClick={() => setActiveFilter(cat)}
                   className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all ${
                     activeFilter === cat 
-                      ? 'bg-[#8B1E3F] text-white border-[#8B1E3F]' 
-                      : 'bg-white text-gray-500 border-gray-200 hover:border-[#8B1E3F] hover:text-[#8B1E3F]'
+                      ? 'bg-[#972037] text-white border-[#972037]' 
+                      : 'bg-white text-gray-500 border-gray-200 hover:border-[#972037] hover:text-[#972037]'
                   }`}
                 >
                   {cat}
@@ -504,7 +504,7 @@ const Publications = () => {
               className="group p-8 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-6 cursor-pointer"
             >
               <div className="hidden md:flex flex-col items-center pt-1 w-16">
-                <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#8B1E3F] mb-2 group-hover:bg-[#8B1E3F] group-hover:text-white transition-colors">
+                <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#972037] mb-2 group-hover:bg-[#972037] group-hover:text-white transition-colors">
                   <FileText className="w-6 h-6" />
                 </div>
                 <span className="text-[10px] font-black text-gray-300 tracking-widest">{pub.year}</span>
@@ -512,12 +512,12 @@ const Publications = () => {
               <div className="flex-grow">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   {pub.tags.map(tag => (
-                    <span key={tag} className="px-2 py-0.5 bg-[#8B1E3F]/5 text-[#8B1E3F] text-[10px] font-black uppercase rounded">
+                    <span key={tag} className="px-2 py-0.5 bg-[#972037]/5 text-[#972037] text-[10px] font-black uppercase rounded">
                       {tag}
                     </span>
                   ))}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight group-hover:text-[#8B1E3F]">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight group-hover:text-[#972037]">
                   {pub.title}
                 </h3>
                 <div className="flex items-center text-sm font-bold text-gray-700 mb-4 italic">
@@ -533,7 +533,7 @@ const Publications = () => {
                     e.stopPropagation(); // Prevents the modal from opening if they just click "Request"
                     setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100);
                   }}
-                  className="flex items-center gap-2 text-xs font-bold uppercase text-gray-400 hover:text-[#8B1E3F] whitespace-nowrap"
+                  className="flex items-center gap-2 text-xs font-bold uppercase text-gray-400 hover:text-[#972037] whitespace-nowrap"
                 >
                   Request <Download className="w-4 h-4" />
                 </button>
@@ -548,22 +548,28 @@ const Publications = () => {
             className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity" 
             onClick={() => setSelectedPub(null)}
           >
+            {/* Modal Card - Set to relative and overflow-y-auto */}
             <div 
-              className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300" 
-              onClick={(e) => e.stopPropagation()} // Prevents clicks inside the modal from closing it
+              className="relative bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in fade-in slide-in-from-bottom-4 duration-300" 
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-8 md:p-12 relative max-h-[90vh] overflow-y-auto">
+              {/* Sticky Close Button Header */}
+              <div className="sticky top-0 z-20 flex justify-end p-4 pointer-events-none">
                 <button 
                   onClick={() => setSelectedPub(null)}
-                  className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Close modal"
+                  className="pointer-events-auto p-2 bg-white/90 hover:bg-gray-100 rounded-full transition-all shadow-sm border border-gray-100/80 hover:text-gray-700"
                 >
-                  <X className="w-6 h-6 text-gray-400" />
+                  <X className="w-6 h-6 text-gray-500" />
                 </button>
+              </div>
 
-                <div className="mb-8 border-b border-gray-100 pb-6 pr-8">
+              {/* Modal Body Content */}
+              <div className="px-8 pb-8 md:px-12 md:pb-12 -mt-12">
+                <div className="mb-8 border-b border-gray-100 pb-6 pr-10">
                   <div className="flex flex-wrap items-center gap-2 mb-3">
                     {selectedPub.tags.map(tag => (
-                      <span key={tag} className="px-2 py-0.5 bg-[#8B1E3F]/5 text-[#8B1E3F] text-[10px] font-black uppercase rounded">
+                      <span key={tag} className="px-2 py-0.5 bg-[#972037]/5 text-[#972037] text-[10px] font-black uppercase rounded">
                         {tag}
                       </span>
                     ))}
@@ -573,7 +579,7 @@ const Publications = () => {
                   </div>
                   <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{selectedPub.title}</h2>
                   <div className="flex items-center text-gray-700 font-bold mb-2">
-                    <User className="w-5 h-5 mr-3 text-[#8B1E3F]" />
+                    <User className="w-5 h-5 mr-3 text-[#972037]" />
                     {selectedPub.authors}
                   </div>
                   <p className="text-sm text-gray-500 italic border-l-2 border-gray-200 pl-3 ml-1 mt-3">
@@ -583,11 +589,11 @@ const Publications = () => {
 
                 <div className="space-y-6 text-gray-600 leading-relaxed">
                   <h4 className="font-bold text-gray-900 uppercase tracking-widest text-sm flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-[#8B1E3F]" /> Abstract
+                    <FileText className="w-4 h-4 mr-2 text-[#972037]" /> Abstract
                   </h4>
-                  <p className="text-lg">
+                  <div className="text-lg">
                     {selectedPub.abstract || "The abstract for this publication is currently unavailable. Please contact us for more details or to request a full copy of the publication."}
-                  </p>
+                  </div>
 
                   <div className="pt-8 mt-8 border-t border-gray-100">
                     <button
@@ -595,7 +601,7 @@ const Publications = () => {
                         setSelectedPub(null);
                         setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100);
                       }}
-                      className="inline-flex items-center px-6 py-3 bg-[#8B1E3F] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-md"
+                      className="inline-flex items-center px-6 py-3 bg-[#972037] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-md"
                     >
                       Request Full Publication <Download className="w-4 h-4 ml-2" />
                     </button>
@@ -610,7 +616,7 @@ const Publications = () => {
           <button
             onClick={scrollToTop}
             aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#8B1E3F] hover:brightness-110 ${
+            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
               showTopBtn 
                 ? 'opacity-100 translate-y-0 pointer-events-auto' 
                 : 'opacity-0 translate-y-4 pointer-events-none'

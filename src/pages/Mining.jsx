@@ -162,7 +162,7 @@ const Mining = () => {
         <div className="max-w-6xl mx-auto">
           
           {/* Navigation - Back to Home */}
-          <Link to="/" className="flex items-center text-[#8B1E3F] font-bold mb-8 hover:underline group w-fit">
+          <Link to="/" className="flex items-center text-[#972037] font-bold mb-8 hover:underline group w-fit">
             <ArrowRight className="rotate-180 w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
           </Link>
 

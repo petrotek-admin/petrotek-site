@@ -17,10 +17,13 @@ import {
   Recycle,
   Rotate3d,
   Leaf,
-  ArrowUp
+  ArrowUp,
+  ArrowRight,
+  ArrowDown
 } from 'lucide-react';
 import ReCAPTCHA from "react-google-recaptcha";
 import emailjs from '@emailjs/browser';
+import OfficeMap from '../components/OfficeMap';
 
 // Custom Oil Derrick Icon - Built to match Lucide's stroke style
 const OilDerrick = ({ className, style }) => (
@@ -204,39 +207,42 @@ const Home = () => {
     }
   }, [activeSection, hasCounted]);
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    
-    const token = recaptchaRef.current?.getValue();
-    if (!token) {
-      alert("Please complete the reCAPTCHA verification.");
-      return;
-    }
+  const handleFormSubmit = async (e) => {
+  e.preventDefault();
+  
+  const token = recaptchaRef.current?.getValue();
+  if (!token) {
+    alert("Please complete the reCAPTCHA verification.");
+    return;
+  }
 
-    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-    const templateParams = {
-      from_name: e.target.firstName.value + " " + e.target.lastName.value,
-      reply_to: e.target.email.value,
-      message: e.target.message.value,
-      'g-recaptcha-response': token,
-    };
-
-    emailjs.send(serviceId, templateId, templateParams, publicKey)
-      .then((result) => {
-        console.log('Email successfully sent!', result.status, result.text);
-        alert("Message sent! We will be in touch soon.");
-        e.target.reset();
-        recaptchaRef.current?.reset();
-      }, (error) => {
-        console.error('Email failed to send:', error);
-        alert("Failed to send message. Please check the console for errors.");
-      });
+  const formData = {
+    firstName: e.target.firstName.value,
+    lastName: e.target.lastName.value,
+    email: e.target.email.value,
+    message: e.target.message.value,
+    recaptchaToken: token,
   };
 
-  const maroon = "#8B1E3F";
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    if (!res.ok) throw new Error('Submission failed');
+
+    alert("Message sent! We will be in touch soon.");
+    e.target.reset();
+    recaptchaRef.current?.reset();
+  } catch (err) {
+    console.error(err);
+    alert("Failed to send message. Please try again.");
+  }
+};
+
+  const maroon = "#972037";
   const anniversaryGraphic = "/33-years-service-graphic.png";
 
   const services = [
@@ -266,7 +272,7 @@ const Home = () => {
       description: "We provide support for oil and gas well permitting, including drill spacing unit permitting, decline curve analysis, correlative rights, and expert witness testimony.", 
       icon: <OilDerrick className="w-8 h-8" />, 
       link: "/oil-and-gas",
-      accent: "#8B1E3F"
+      accent: "#972037"
     },
     { 
       title: "Carbon Capture (CO2 CCS)", 
@@ -393,7 +399,7 @@ const Home = () => {
             <div className="w-full lg:w-[60%] flex flex-col justify-center text-center lg:text-left">
               <div className="max-w-3xl [@media(min-width:1600px)]:max-w-5xl mx-auto lg:mx-0">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl [@media(min-width:1600px)]:text-7xl font-extrabold text-white leading-[1.15] mb-6 sm:mb-8 tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]">
-                  Injection Well and Subsurface Resources Consultants
+                  Injection Well and Subsurface Resource Consultants
                 </h1>
                 
                 <div className="flex justify-center lg:justify-start items-center">
@@ -483,10 +489,10 @@ const Home = () => {
                 <li key={item.name}>
                   <button 
                     onClick={() => scrollToId(item.href)}
-                    className={`text-xs lg:text-sm font-bold uppercase tracking-widest transition-colors relative group py-5 ${isActive ? 'text-[#8B1E3F]' : 'text-gray-500 hover:text-[#8B1E3F]'}`}
+                    className={`text-xs lg:text-sm font-bold uppercase tracking-widest transition-colors relative group py-5 ${isActive ? 'text-[#972037]' : 'text-gray-500 hover:text-[#972037]'}`}
                   >
                     {item.name}
-                    <span className={`absolute bottom-4 left-0 h-0.5 bg-[#8B1E3F] transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+                    <span className={`absolute bottom-4 left-0 h-0.5 bg-[#972037] transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
                   </button>
                 </li>
               );
@@ -513,7 +519,7 @@ const Home = () => {
               
               <div className="flex items-center space-x-6 mb-8">
                 <img src={anniversaryGraphic} alt="33 Years" className="w-16 h-16 sm:w-20 sm:h-20 grayscale brightness-0 opacity-100 shrink-0" />
-                <span className="text-sm sm:text-base font-bold text-gray-800 uppercase tracking-wider border-l-2 border-[#8B1E3F] pl-4 sm:pl-6 leading-snug">
+                <span className="text-sm sm:text-base font-bold text-gray-800 uppercase tracking-wider border-l-2 border-[#972037] pl-4 sm:pl-6 leading-snug">
                   Over Three Decades of <br /> Professional Excellence
                 </span>
               </div>
@@ -589,7 +595,7 @@ const Home = () => {
               <div className="w-full h-1" style={{ backgroundColor: maroon }}></div>
             </div>
             <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-600 leading-relaxed">
-              Petrotek provides specialized engineering for complex subsurface challenges across North America and beyond.
+              Petrotek provides specialized technical and logistics services to solve complex subsurface challenges across North America and beyond.
             </p>
           </div>
 
@@ -642,7 +648,7 @@ const Home = () => {
           </div>
           
           <p className="max-w-3xl mx-auto text-base sm:text-lg text-gray-700 mb-3">
-            Petrotek provides consulting services to many industries for managing wastewater that is protective of drinking water sources and the environment.
+            Petrotek provides consulting services to many industries for the management of wastewater using technology that is protective of drinking water sources and the environment.
           </p>
           <p className="text-sm sm:text-base text-gray-500 italic mb-12">
             Some of the industries we serve include:
@@ -667,72 +673,125 @@ const Home = () => {
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden grid lg:grid-cols-5">
             
             {/* Contact Details Left Panel */}
-            <div className="lg:col-span-2 p-6 sm:p-10 lg:p-12 text-white flex flex-col justify-between" style={{ backgroundColor: maroon }}>
+            <div className="lg:col-span-2 text-white flex flex-col justify-between overflow-hidden" style={{ backgroundColor: maroon }}>
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold mb-6">Get In Touch</h2>
-                <div className="space-y-5 text-sm sm:text-base">
+                {/* 1. Header Banner Image */}
+                <div className="relative w-full aspect-[1200/471] overflow-hidden bg-black/30 border-b border-white/15">
+                  <img 
+                    src="/Office.png" 
+                    alt="Contact Header" 
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/0 flex items-end p-6 sm:p-8">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight drop-shadow-md">
+                      Get In Touch
+                    </h2>
+                  </div>
+                </div>
+
+                {/* 2. Contact Items Section */}
+                <div className="p-6 sm:p-8 space-y-5 text-sm sm:text-base">
                   <div className="flex items-start space-x-3.5">
                     <MapPin className="w-5 h-5 mt-1 shrink-0" />
                     <p className="leading-relaxed">5935 South Zang Street, Suite 200<br />Littleton, Colorado USA 80127</p>
                   </div>
+
                   <div className="flex items-center space-x-3.5">
                     <Phone className="w-5 h-5 shrink-0" />
                     <p><a href="tel:3032909414" className="hover:underline font-semibold">(303) 290-9414</a></p>
                   </div>
+
+                  {/* Form Indicator with Directional Arrow */}
+                  <div className="flex items-start space-x-3.5 group">
+                    <Mail className="w-5 h-5 mt-0.5 shrink-0" />
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-medium text-white/95">
+                        Send us a message using our contact form
+                      </span>
+                      <span className="inline-flex items-center text-white drop-shadow-sm">
+                        <ArrowRight className="hidden lg:inline-block w-5 h-5 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
+                        <ArrowDown className="inline-block lg:hidden w-5 h-5 stroke-[2.5] group-hover:translate-y-1 transition-transform" />
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-8 rounded-xl overflow-hidden shadow-inner border border-white/20">
-                <iframe 
-                  src="https://maps.google.com/maps?width=600&amp;height=400&amp;hl=en&amp;q=5935 South Zang Street, Suite 200 Littleton, Colorado USA 80127&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-                  width="100%" 
-                  height="260" 
-                  style={{ border: 0 }} 
-                  allowFullScreen="" 
-                  loading="lazy" 
-                  title="Office Location"
-                ></iframe>
+              {/* 3. Custom Vector / Tile Map */}
+              <div className="p-6 sm:p-8 pt-0">
+                <div className="rounded-xl overflow-hidden shadow-inner border border-white/20">
+                  <OfficeMap height="240px" />
+                </div>
               </div>
             </div>
 
             {/* Form Right Panel */}
-            <form className="lg:col-span-3 p-6 sm:p-10 lg:p-12 space-y-5" onSubmit={handleFormSubmit}>
-              <div className="grid sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-xs sm:text-sm font-bold text-gray-700">First Name</label>
-                  <input required name="firstName" type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#8B1E3F] outline-none text-sm transition-all" />
+            <form 
+              className="lg:col-span-3 p-6 sm:p-10 lg:p-12 flex flex-col justify-between h-full space-y-5" 
+              onSubmit={handleFormSubmit}
+            >
+              <div className="space-y-5 flex-1 flex flex-col">
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="text-xs sm:text-sm font-bold text-gray-700">First Name</label>
+                    <input 
+                      required 
+                      name="firstName" 
+                      type="text" 
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#972037] outline-none text-sm transition-all" 
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs sm:text-sm font-bold text-gray-700">Last Name</label>
+                    <input 
+                      required 
+                      name="lastName" 
+                      type="text" 
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#972037] outline-none text-sm transition-all" 
+                    />
+                  </div>
                 </div>
+                
                 <div className="space-y-1.5">
-                  <label className="text-xs sm:text-sm font-bold text-gray-700">Last Name</label>
-                  <input required name="lastName" type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#8B1E3F] outline-none text-sm transition-all" />
+                  <label className="text-xs sm:text-sm font-bold text-gray-700">Email Address</label>
+                  <input 
+                    required 
+                    name="email" 
+                    type="email" 
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#972037] outline-none text-sm transition-all" 
+                  />
                 </div>
-              </div>
-              
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-bold text-gray-700">Email Address</label>
-                <input required name="email" type="email" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#8B1E3F] outline-none text-sm transition-all" />
-              </div>
-              
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-bold text-gray-700">Message</label>
-                <textarea required name="message" rows="4" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#8B1E3F] outline-none text-sm transition-all"></textarea>
+                
+                {/* Dynamically expanding textarea */}
+                <div className="space-y-1.5 flex-1 flex flex-col">
+                  <label className="text-xs sm:text-sm font-bold text-gray-700">Message</label>
+                  <textarea 
+                    required 
+                    name="message" 
+                    className="w-full flex-1 min-h-[140px] px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#972037] outline-none text-sm transition-all resize-y"
+                  ></textarea>
+                </div>
               </div>
 
-              <div className="overflow-x-auto py-1">
-                {import.meta.env.VITE_RECAPTCHA_SITE ? (
-                  <ReCAPTCHA ref={recaptchaRef} sitekey={import.meta.env.VITE_RECAPTCHA_SITE} />
-                ) : (
-                  <p className="text-red-500 text-xs italic">reCAPTCHA Key Missing</p>
-                )}
-              </div>
+              {/* Bottom controls remain pinned to the base */}
+              <div className="space-y-5 pt-2">
+                <div className="overflow-x-auto py-1">
+                  {import.meta.env.VITE_RECAPTCHA_SITE ? (
+                    <ReCAPTCHA ref={recaptchaRef} sitekey={import.meta.env.VITE_RECAPTCHA_SITE} />
+                  ) : (
+                    <p className="text-red-500 text-xs italic">reCAPTCHA Key Missing</p>
+                  )}
+                </div>
 
-              <button 
-                type="submit" 
-                className="w-full py-4 text-white text-xs sm:text-sm font-bold rounded-lg uppercase tracking-widest shadow-md hover:brightness-110 active:scale-[0.99] transition-all" 
-                style={{ backgroundColor: maroon }}
-              >
-                Send Message
-              </button>
+                <button 
+                  type="submit" 
+                  className="w-full py-4 text-white text-xs sm:text-sm font-bold rounded-lg uppercase tracking-widest shadow-md hover:brightness-110 active:scale-[0.99] transition-all" 
+                  style={{ backgroundColor: maroon }}
+                >
+                  Send Message
+                </button>
+              </div>
             </form>
           </div>
         </div>

@@ -55,7 +55,7 @@ const OilDerrick = ({ className, style }) => (
 );
 
 const OilGas = () => {
-  const maroon = "#8B1E3F";
+  const maroon = "#972037";
 
   // --- Scroll to Top state & handler ---
   const [showTopBtn, setShowTopBtn] = useState(false);
@@ -90,7 +90,7 @@ const OilGas = () => {
         <div className="max-w-8xl mx-auto">
           
         {/* Navigation - Back to Home */}
-        <Link to="/" className="flex items-center text-[#8B1E3F] font-bold mb-8 hover:underline group w-fit">
+        <Link to="/" className="flex items-center text-[#972037] font-bold mb-8 hover:underline group w-fit">
           <ArrowRight className="rotate-180 w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
         </Link>
 
@@ -100,7 +100,7 @@ const OilGas = () => {
               <OilDerrick className="w-10 h-10" style={{ color: maroon }} />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">Oil & Gas Upstream E&P</h1>
-            <p className="text-xl text-[#8B1E3F] font-bold mb-6">Expertise Grounded in Decades of Field and Reservoir Experience</p>
+            <p className="text-xl text-[#972037] font-bold mb-6">Expertise Grounded in Decades of Field and Reservoir Experience</p>
             <div className="w-24 h-1 mb-8" style={{ backgroundColor: maroon }}></div>
           </div>
 
@@ -185,7 +185,7 @@ const OilGas = () => {
           {/* Brine Disposal Callout */}
           <div className="bg-gray-300 text-white rounded-2xl p-10 md:p-14 shadow-2xl relative overflow-hidden mb-16">
             <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-shrink-0 bg-[#8B1E3F] p-5 rounded-full">
+              <div className="flex-shrink-0 bg-[#972037] p-5 rounded-full">
                 <Droplet className="w-10 h-10 text-white" />
               </div>
               <div>
@@ -193,7 +193,7 @@ const OilGas = () => {
                 <p className="text-gray-600 leading-relaxed mb-4">
                   Petrotek handles all aspects of Class II brine disposal, from siting and permitting to construction oversight and regulatory compliance.
                 </p>
-                <Link to="/injection-wells" className="text-[#8B1E3F] font-bold flex items-center hover:underline">
+                <Link to="/injection-wells" className="text-[#972037] font-bold flex items-center hover:underline">
                   Explore our full Injection Well Services <ArrowRight className="ml-2 w-4 h-4" />
                 </Link>
               </div>
@@ -206,7 +206,7 @@ const OilGas = () => {
              <Link 
                to="/" 
                onClick={() => setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100)}
-               className="inline-flex items-center px-8 py-4 bg-[#8B1E3F] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg"
+               className="inline-flex items-center px-8 py-4 bg-[#972037] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg"
              >
                Consult Our E&P Experts <ChevronRight className="ml-2 w-5 h-5" />
              </Link>
@@ -216,7 +216,7 @@ const OilGas = () => {
           <button
             onClick={scrollToTop}
             aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#8B1E3F] hover:brightness-110 ${
+            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
               showTopBtn 
                 ? 'opacity-100 translate-y-0 pointer-events-auto' 
                 : 'opacity-0 translate-y-4 pointer-events-none'

@@ -400,7 +400,7 @@ const handleFormSubmit = async (e) => {
         {/* 2. Hero Content - Centered */}
         <div className="w-full px-6 sm:px-10 md:px-16 lg:px-20 [@media(min-width:1600px)]:px-40 relative z-20 flex-1 flex flex-col min-[1001px]:flex-row items-center justify-center max-w-[2000px] mx-auto py-28 lg:py-0 gap-8 min-[1001px]:gap-12"> 
           
-          {/* Headline (Order 1 everywhere) */}
+          {/* Headline (Order 1) */}
           <div className="w-full min-[1001px]:w-[60%] flex flex-col justify-center text-center min-[1001px]:text-left order-1">
             <div className="max-w-3xl [@media(min-width:1600px)]:max-w-5xl mx-auto min-[1001px]:mx-0">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl [@media(min-width:1600px)]:text-7xl font-extrabold text-white leading-[1.15] mb-0 min-[1001px]:mb-8 tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]">
@@ -420,7 +420,7 @@ const handleFormSubmit = async (e) => {
             </div>
           </div>
 
-          {/* Anniversary Graphic (Order 2 on mobile, sits above the mobile button) */}
+          {/* Anniversary Graphic (Order 2) */}
           <div className="w-full min-[1001px]:w-[38%] flex justify-center items-center order-2">
             <img 
               src={anniversaryGraphic} 
@@ -430,7 +430,7 @@ const handleFormSubmit = async (e) => {
             />
           </div>
 
-          {/* Mobile Button (Order 3: Displays strictly below badge on <= 1000px, hidden on desktop) */}
+          {/* Mobile Button (Order 3) */}
           <div className="w-full flex min-[1001px]:hidden justify-center items-center order-3 mt-4">
             <button 
               onClick={() => scrollToId('#whatwedo')} 

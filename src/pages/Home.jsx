@@ -391,26 +391,27 @@ const handleFormSubmit = async (e) => {
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
           <div className="absolute inset-0 bg-black/40 z-10"></div>
           <img 
-            src="/Hero.png" 
+            src="/Hero.webp"  
             alt="Petrotek Background" 
             className="h-full w-full object-cover"
           />
         </div>
 
         {/* 2. Hero Content - Centered */}
-        <div className="w-full px-6 sm:px-10 md:px-16 lg:px-20 [@media(min-width:1600px)]:px-40 relative z-20 flex-1 flex flex-col lg:flex-row items-center justify-center max-w-[2000px] mx-auto py-28 lg:py-0 gap-10 lg:gap-12"> 
+        <div className="w-full px-6 sm:px-10 md:px-16 lg:px-20 [@media(min-width:1600px)]:px-40 relative z-20 flex-1 flex flex-col min-[1001px]:flex-row items-center justify-center max-w-[2000px] mx-auto py-28 lg:py-0 gap-8 min-[1001px]:gap-12"> 
           
-          {/* Left Column: Headline & Action */}
-          <div className="w-full lg:w-[60%] flex flex-col justify-center text-center lg:text-left">
-            <div className="max-w-3xl [@media(min-width:1600px)]:max-w-5xl mx-auto lg:mx-0">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl [@media(min-width:1600px)]:text-7xl font-extrabold text-white leading-[1.15] mb-6 sm:mb-8 tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]">
+          {/* Headline (Order 1 everywhere) */}
+          <div className="w-full min-[1001px]:w-[60%] flex flex-col justify-center text-center min-[1001px]:text-left order-1">
+            <div className="max-w-3xl [@media(min-width:1600px)]:max-w-5xl mx-auto min-[1001px]:mx-0">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl [@media(min-width:1600px)]:text-7xl font-extrabold text-white leading-[1.15] mb-0 min-[1001px]:mb-8 tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]">
                 Injection Well and Subsurface Resource Consultants
               </h1>
               
-              <div className="flex justify-center lg:justify-start items-center">
+              {/* Desktop Button (Hidden on <= 1000px) */}
+              <div className="hidden min-[1001px]:flex justify-start items-center">
                 <button 
                   onClick={() => scrollToId('#whatwedo')} 
-                  className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 [@media(min-width:1600px)]:px-14 [@media(min-width:1600px)]:py-5 text-white text-sm sm:text-base [@media(min-width:1600px)]:text-lg font-bold rounded-lg shadow-xl transition-all hover:brightness-110 active:scale-95 text-center" 
+                  className="px-8 sm:px-10 py-3.5 sm:py-4 [@media(min-width:1600px)]:px-14 [@media(min-width:1600px)]:py-5 text-white text-sm sm:text-base [@media(min-width:1600px)]:text-lg font-bold rounded-lg shadow-xl transition-all hover:brightness-110 active:scale-95 text-center" 
                   style={{ backgroundColor: maroon }}
                 >
                   Explore Services
@@ -419,8 +420,8 @@ const handleFormSubmit = async (e) => {
             </div>
           </div>
 
-          {/* Right Column: Anniversary Graphic */}
-          <div className="w-full lg:w-[38%] flex justify-center items-center">
+          {/* Anniversary Graphic (Order 2 on mobile, sits above the mobile button) */}
+          <div className="w-full min-[1001px]:w-[38%] flex justify-center items-center order-2">
             <img 
               src={anniversaryGraphic} 
               alt="33 Years of UIC Service" 
@@ -429,12 +430,23 @@ const handleFormSubmit = async (e) => {
             />
           </div>
 
+          {/* Mobile Button (Order 3: Displays strictly below badge on <= 1000px, hidden on desktop) */}
+          <div className="w-full flex min-[1001px]:hidden justify-center items-center order-3 mt-4">
+            <button 
+              onClick={() => scrollToId('#whatwedo')} 
+              className="w-auto px-6 py-2.5 sm:px-8 sm:py-3 text-white text-xs sm:text-sm font-bold tracking-wider rounded-lg shadow-lg transition-all hover:brightness-110 active:scale-95 text-center" 
+              style={{ backgroundColor: maroon }}
+            >
+              Explore Services
+            </button>
+          </div>
+
         </div>
 
         {/* 3. Slogan Section */}
         <div className="w-full h-16 lg:h-20 relative z-20 shrink-0 flex justify-center items-center bg-[#972037]/75 backdrop-blur-xl border-t border-white/20 shadow-2xl">
           <div className="w-full px-4 sm:px-6 md:px-12 lg:px-20 [@media(min-width:1600px)]:px-40 mx-auto max-w-[2000px]">
-            <div className="flex flex-row items-center justify-between sm:justify-evenly gap-2 sm:gap-4">
+            <div className="flex flex-row items-center justify-between sm:justify-evenly gap-2 sm:gap-4"> 
               
               {/* Item 1 -> Clients Served */}
               <button 

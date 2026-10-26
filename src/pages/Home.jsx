@@ -385,101 +385,96 @@ const handleFormSubmit = async (e) => {
   return (
     <>
       {/* Hero Section */}
-      <header id="home" className="relative flex flex-col min-h-[100svh] lg:h-screen overflow-hidden bg-white">
+      <header id="home" className="relative flex flex-col justify-between min-h-[100svh] lg:h-screen overflow-hidden bg-gray-900">
         
-        {/* 1. Background Image Container */}
-        <div className="relative flex-1 w-full overflow-hidden bg-gray-900 shrink-0 flex items-center justify-center">
-          <div className="absolute inset-0 opacity-100 overflow-hidden">
-            <div className="absolute inset-0 bg-black/30 z-10"></div>
+        {/* 1. Full-Cover Background Image */}
+        <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-black/40 z-10"></div>
+          <img 
+            src="/Hero.png" 
+            alt="Petrotek Background" 
+            className="h-full w-full object-cover"
+          />
+        </div>
+
+        {/* 2. Hero Content - Centered */}
+        <div className="w-full px-6 sm:px-10 md:px-16 lg:px-20 [@media(min-width:1600px)]:px-40 relative z-20 flex-1 flex flex-col lg:flex-row items-center justify-center max-w-[2000px] mx-auto py-28 lg:py-0 gap-10 lg:gap-12"> 
+          
+          {/* Left Column: Headline & Action */}
+          <div className="w-full lg:w-[60%] flex flex-col justify-center text-center lg:text-left">
+            <div className="max-w-3xl [@media(min-width:1600px)]:max-w-5xl mx-auto lg:mx-0">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl [@media(min-width:1600px)]:text-7xl font-extrabold text-white leading-[1.15] mb-6 sm:mb-8 tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]">
+                Injection Well and Subsurface Resource Consultants
+              </h1>
+              
+              <div className="flex justify-center lg:justify-start items-center">
+                <button 
+                  onClick={() => scrollToId('#whatwedo')} 
+                  className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 [@media(min-width:1600px)]:px-14 [@media(min-width:1600px)]:py-5 text-white text-sm sm:text-base [@media(min-width:1600px)]:text-lg font-bold rounded-lg shadow-xl transition-all hover:brightness-110 active:scale-95 text-center" 
+                  style={{ backgroundColor: maroon }}
+                >
+                  Explore Services
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Anniversary Graphic */}
+          <div className="w-full lg:w-[38%] flex justify-center items-center">
             <img 
-              src="/Hero.jpg" 
-              alt="Petrotek Background" 
-              className="h-full w-full object-cover"
+              src={anniversaryGraphic} 
+              alt="33 Years of UIC Service" 
+              className="w-32 h-32 sm:w-44 sm:h-44 md:w-56 md:h-56 lg:w-72 lg:h-72 xl:w-80 xl:h-80 2xl:w-[380px] 2xl:h-[380px] [@media(min-width:1600px)]:w-[440px] [@media(min-width:1600px)]:h-[440px] object-contain filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:scale-105" 
+              onError={(e) => { e.target.style.display = 'none'; }} 
             />
           </div>
 
-          {/* Hero Content - Perfectly Vertically Centered Across All Viewports */}
-          <div className="w-full px-6 sm:px-10 md:px-16 lg:px-20 [@media(min-width:1600px)]:px-40 relative z-20 flex flex-col lg:flex-row items-center justify-between max-w-[2000px] mx-auto py-28 lg:py-0 gap-10 lg:gap-12"> 
-            
-            {/* Left Column: Headline & Action */}
-            <div className="w-full lg:w-[60%] flex flex-col justify-center text-center lg:text-left">
-              <div className="max-w-3xl [@media(min-width:1600px)]:max-w-5xl mx-auto lg:mx-0">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl [@media(min-width:1600px)]:text-7xl font-extrabold text-white leading-[1.15] mb-6 sm:mb-8 tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)]">
-                  Injection Well and Subsurface Resource Consultants
-                </h1>
-                
-                <div className="flex justify-center lg:justify-start items-center">
-                  <button 
-                    onClick={() => scrollToId('#whatwedo')} 
-                    className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 [@media(min-width:1600px)]:px-14 [@media(min-width:1600px)]:py-5 text-white text-sm sm:text-base [@media(min-width:1600px)]:text-lg font-bold rounded-lg shadow-xl transition-all hover:brightness-110 active:scale-95 text-center" 
-                    style={{ backgroundColor: maroon }}
-                  >
-                    Explore Services
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Anniversary Graphic (Fluid & Prominent on Wide Screens) */}
-            <div className="w-full lg:w-[38%] flex justify-center items-center">
-              <img 
-                src={anniversaryGraphic} 
-                alt="33 Years of UIC Service" 
-                className="w-32 h-32 sm:w-44 sm:h-44 md:w-56 md:h-56 lg:w-72 lg:h-72 xl:w-80 xl:h-80 2xl:w-[380px] 2xl:h-[380px] [@media(min-width:1600px)]:w-[440px] [@media(min-width:1600px)]:h-[440px] object-contain filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:scale-105" 
-                onError={(e) => { e.target.style.display = 'none'; }} 
-              />
-            </div>
-
-          </div>
         </div>
 
-        {/* 2. Slogan Section - Height locked to top nav (h-16 / lg:h-20) */}
-          <div 
-            className="w-full h-16 lg:h-25 flex justify-center items-center shrink-0 border-t border-white/10" 
-            style={{ backgroundColor: maroon }}
-          >
-            <div className="w-full px-4 sm:px-6 md:px-12 lg:px-20 [@media(min-width:1600px)]:px-40 mx-auto max-w-[2000px]">
-              <div className="flex flex-row items-center justify-between sm:justify-evenly gap-2 sm:gap-4">
-                
-                {/* Item 1 -> Clients Served */}
-                <button 
-                  onClick={() => scrollToId('#clientsserved')}
-                  className="flex-1 text-center px-1 group cursor-pointer transition-transform active:scale-95 focus:outline-none"
-                >
-                  <span className="text-[12px] sm:text-base md:text-xl lg:text-2xl font-bold tracking-tight text-white italic leading-tight block group-hover:underline underline-offset-4 decoration-white/60 transition-all">
-                    Building Relationships
-                  </span>
-                </button>
+        {/* 3. Slogan Section */}
+        <div className="w-full h-16 lg:h-20 relative z-20 shrink-0 flex justify-center items-center bg-[#972037]/75 backdrop-blur-xl border-t border-white/20 shadow-2xl">
+          <div className="w-full px-4 sm:px-6 md:px-12 lg:px-20 [@media(min-width:1600px)]:px-40 mx-auto max-w-[2000px]">
+            <div className="flex flex-row items-center justify-between sm:justify-evenly gap-2 sm:gap-4">
+              
+              {/* Item 1 -> Clients Served */}
+              <button 
+                onClick={() => scrollToId('#clientsserved')}
+                className="flex-1 text-center px-1 group cursor-pointer transition-transform active:scale-95 focus:outline-none"
+              >
+                <span className="text-[12px] sm:text-base md:text-xl lg:text-2xl font-bold tracking-tight text-white italic leading-tight block group-hover:underline underline-offset-4 decoration-white/60 transition-all drop-shadow-sm">
+                  Building Relationships
+                </span>
+              </button>
 
-                {/* Separator 1 */}
-                <div className="h-6 sm:h-8 lg:h-10 w-px bg-white/30 shrink-0"></div>
+              {/* Separator 1 */}
+              <div className="h-6 sm:h-8 lg:h-10 w-px bg-white/30 shrink-0"></div>
 
-                {/* Item 2 -> Core Capabilities */}
-                <button 
-                  onClick={() => scrollToId('#whatwedo')}
-                  className="flex-1 text-center px-1 group cursor-pointer transition-transform active:scale-95 focus:outline-none"
-                >
-                  <span className="text-[12px] sm:text-base md:text-xl lg:text-2xl font-bold tracking-tight text-white italic leading-tight block group-hover:underline underline-offset-4 decoration-white/60 transition-all">
-                    Solving Problems
-                  </span>
-                </button>
+              {/* Item 2 -> Core Capabilities */}
+              <button 
+                onClick={() => scrollToId('#whatwedo')}
+                className="flex-1 text-center px-1 group cursor-pointer transition-transform active:scale-95 focus:outline-none"
+              >
+                <span className="text-[12px] sm:text-base md:text-xl lg:text-2xl font-bold tracking-tight text-white italic leading-tight block group-hover:underline underline-offset-4 decoration-white/60 transition-all drop-shadow-sm">
+                  Solving Problems
+                </span>
+              </button>
 
-                {/* Separator 2 */}
-                <div className="h-6 sm:h-8 lg:h-10 w-px bg-white/30 shrink-0"></div>
+              {/* Separator 2 */}
+              <div className="h-6 sm:h-8 lg:h-10 w-px bg-white/30 shrink-0"></div>
 
-                {/* Item 3 -> Industries Served */}
-                <button 
-                  onClick={() => scrollToId('#industries')}
-                  className="flex-1 text-center px-1 group cursor-pointer transition-transform active:scale-95 focus:outline-none"
-                >
-                  <span className="text-[12px] sm:text-base md:text-xl lg:text-2xl font-bold tracking-tight text-white italic leading-tight block group-hover:underline underline-offset-4 decoration-white/60 transition-all">
-                    Adding Value
-                  </span>
-                </button>
+              {/* Item 3 -> Industries Served */}
+              <button 
+                onClick={() => scrollToId('#industries')}
+                className="flex-1 text-center px-1 group cursor-pointer transition-transform active:scale-95 focus:outline-none"
+              >
+                <span className="text-[12px] sm:text-base md:text-xl lg:text-2xl font-bold tracking-tight text-white italic leading-tight block group-hover:underline underline-offset-4 decoration-white/60 transition-all drop-shadow-sm">
+                  Adding Value
+                </span>
+              </button>
 
-              </div>
             </div>
           </div>
+        </div>
       </header>
 
       {/* Sticky Sub-Navigation */}

@@ -248,35 +248,7 @@ const handleFormSubmit = async (e) => {
     }
   };
 
-  const heroImgRef = useRef(null);
-
-    useEffect(() => {
-      // Respect users who prefer reduced motion
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-      let ticking = false;
-      const PARALLAX_SPEED = 0.3; // 0 = no effect, 0.5 = strong
-
-      const update = () => {
-        const y = window.scrollY;
-        // Only animate while the hero is (roughly) on screen
-        if (heroImgRef.current && y < window.innerHeight * 1.5) {
-          heroImgRef.current.style.transform = `translate3d(0, ${y * PARALLAX_SPEED}px, 0)`;
-        }
-        ticking = false;
-      };
-
-      const onScroll = () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      };
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-      update();
-      return () => window.removeEventListener('scroll', onScroll);
-    }, []);
+  
 
   const maroon = "#972037";
   const anniversaryGraphic = "/33-years-service-graphic.png";
@@ -420,11 +392,10 @@ const handleFormSubmit = async (e) => {
         {/* 1. Full-Cover Background Image */}
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
           <div className="absolute inset-0 bg-black/40 z-10"></div>
-          <img
-            ref={heroImgRef}
-            src="/Hero.png"
-            alt="Petrotek Background"
-            className="absolute left-0 -top-[30%] h-[130%] w-full object-cover will-change-transform"
+          <img 
+            src="/Hero.webp"  
+            alt="Petrotek Background" 
+            className="h-full w-full object-cover"
           />
         </div>
 

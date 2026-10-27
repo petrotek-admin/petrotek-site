@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  ChevronDown, 
   ChevronRight, 
   Globe, 
   Activity, 
@@ -11,18 +10,14 @@ import {
   Phone, 
   Mail,
   Droplet,
-  CloudRain,
   HardHat,
   Pickaxe,
   Recycle,
-  Rotate3d,
   Leaf,
-  ArrowUp,
   ArrowRight,
   ArrowDown
 } from 'lucide-react';
 import ReCAPTCHA from "react-google-recaptcha";
-import emailjs from '@emailjs/browser';
 import OfficeMap from '../components/OfficeMap';
 
 // Custom Oil Derrick Icon - Built to match Lucide's stroke style
@@ -124,12 +119,10 @@ const IndustryCard = ({ item, maroon, onInquire }) => {
 };
 
 const Home = () => {
-  const [scrollOffset, setScrollOffset] = useState(0);
   const [activeSection, setActiveSection] = useState("home");
   const recaptchaRef = useRef();
 
   useEffect(() => {
-    const handleScroll = () => setScrollOffset(window.scrollY > 500 ? 501 : 0);
 
     const observerOptions = {
       root: null,
@@ -149,34 +142,13 @@ const Home = () => {
     const sections = document.querySelectorAll('header[id], section[id]');
     sections.forEach((section) => observer.observe(section));
 
-    window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
   }, []);
 
   const scrollToId = (id) => {
-    const element = document.getElementById(id.replace('#', ''));
-    if (element) {
-      const offset = 100;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    document.getElementById(id.replace('#', ''))?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const [counts, setCounts] = useState({ clients: 0, projects: 0 });
@@ -221,6 +193,7 @@ const handleFormSubmit = async (e) => {
       lastName: e.target.lastName.value,
       email: e.target.email.value,
       message: e.target.message.value,
+      token
     };
 
     try {
@@ -815,19 +788,6 @@ const handleFormSubmit = async (e) => {
           </div>
         </div>
       </section>
-      {/* Floating Back-to-Top Button */}
-      <button
-        onClick={scrollToTop}
-        aria-label="Back to top"
-        className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white ${
-          scrollOffset > 500
-            ? 'opacity-100 translate-y-0 pointer-events-auto'
-            : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}
-        style={{ backgroundColor: maroon }}
-      >
-        <ArrowUp className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
-      </button>
     </>
   );
 };

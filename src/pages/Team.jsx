@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -7,8 +7,7 @@ import {
   X,
   ChevronRight,
   Scale,
-  History,
-  ArrowUp
+  History
 } from 'lucide-react';
 
 const OurTeam = () => {
@@ -16,25 +15,6 @@ const OurTeam = () => {
   // Logic: searchTerm state has been removed
   const [selectedMember, setSelectedMember] = useState(null);
   const [showCredits, setShowCredits] = useState(false);
-
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const teamData = [
     {
@@ -44,7 +24,7 @@ const OurTeam = () => {
       tags: ["Geology", "Field Operations", "Corporate Operations", "Contract Negotiations"],
       bio: (
       <>
-        <p>Wes is one of the managing principals of Petrotek and serves as Director of Field Operations. He holds a B.S. degree in Geology from the University of South Alabama. Wes has more than twenty years of experience with wellsite field work and the application of geology to permitting for all classes of injection well projects. He also has experience in contract negotiations, business relationship optimization, and Corporate operations. His Field Director position includes supervising complex projects and operations along with well drilling, completion, testing and stimulation work throughout the country. He regularly leads staff to get efficient results for clients in feasibility and permitting efforts. Wes has been actively involved in all facets of the permitting, design, installation, sampling, testing, maintenance, and remediation of disposal wells across thecountry.</p> 
+        <p>Wes is one of the managing principals of Petrotek and serves as Director of Field Operations. He holds a B.S. degree in Geology from the University of South Alabama. Wes has more than twenty years of experience with wellsite field work and the application of geology to permitting for all classes of injection well projects. He also has experience in contract negotiations, business relationship optimization, and Corporate operations. His Field Director position includes supervising complex projects and operations along with well drilling, completion, testing and stimulation work throughout the country. He regularly leads staff to get efficient results for clients in feasibility and permitting efforts. Wes has been actively involved in all facets of the permitting, design, installation, sampling, testing, maintenance, and remediation of disposal wells across the country.</p> 
         <br></br>
         <p>Wes is an active member of the Rocky Mountain Association of Geologists, the Society of Petroleum Engineers, the American Association of Petroleum Geologists, and is a Licensed Professional Geologist in Wyoming, Indiana, Kansas, Nebraska, Texas, Louisiana, Illinois, Florida, and Utah. He has published and given a variety of talks regarding subsurface injection, and is an active member of the Rocky Mountain Association of Geologists, the Society of Petroleum Engineers, and the American Association of Petroleum Geologists.</p>
       </>
@@ -77,8 +57,8 @@ const OurTeam = () => {
       name: "David Huffington, M.S., P.G.",
       role: "Principal, Managing Geologist",
       education: "B.S. Geophysical Engineering, Colorado School of Mines; M.S. Petroleum Reservoir Systems, Colorado School of Mines",
-      tags: ["Geologic Feasability", "Wireline", "Geologic Testimony", "Cased Hole Logs"],
-      bio: "David is a Senior Geologist at Petrotek Corporation with more than ten years of industry experience. He holds Professional Geology licenses in multiple states. His work primarily focuses on injection well feasibility studies, new Class I, Class II, and Class VI permits, Class I permit renewals, land ban petition exemption renewals, mechanical integrity testing, drilling, and geologic testimony. David has designed, supervised, and interpreted many different types of mechanical integrity tests in a wide variety of well circumstances. Prior to Petrotek, David worked for Halliburton as a wireline field engineer, running a variety of cased hole logs including pulse neutron, cement evaluation, flow profiles, perforating, and casing cuts. David Has a Bachelor of Science in Geophysical Engineering and a Master’s degree in Petroleum Reservoir Systems from the Colorado School of Mines.",
+      tags: ["Geologic Feasibility", "Wireline", "Geologic Testimony", "Cased Hole Logs"],
+      bio: "David is a Senior Geologist at Petrotek Corporation with more than ten years of industry experience. He holds Professional Geology licenses in multiple states. His work primarily focuses on injection well feasibility studies, new Class I, Class II, and Class VI permits, Class I permit renewals, land ban petition exemption renewals, mechanical integrity testing, drilling, and geologic testimony. David has designed, supervised, and interpreted many different types of mechanical integrity tests in a wide variety of well circumstances. Prior to Petrotek, David worked for Halliburton as a wireline field engineer, running a variety of cased hole logs including pulse neutron, cement evaluation, flow profiles, perforating, and casing cuts. David has a Bachelor of Science in Geophysical Engineering and a Master’s degree in Petroleum Reservoir Systems from the Colorado School of Mines.",
       personal: "David is a member of the Society of Petrophysicists and Well Log Analysts, Rocky Mountain Association of Geologists, and the Denver Well Logging Society."
     },
     {
@@ -148,7 +128,7 @@ const OurTeam = () => {
     {
       name: "Cameron Kerr, B.S.",
       role: "Project Engineer",
-      education: "B.S. Petroleum Engineering, Colorado School of Mines; B.S. Business Adminstration, University of Denver",
+      education: "B.S. Petroleum Engineering, Colorado School of Mines; B.S. Business Administration, University of Denver",
       tags: ["Production", "Completions", "Workover Support", "Basin Analysis"],
       bio: "Following graduation from Mines, Cameron spent time in the oil and gas space as a Production Engineer, Field Frac Engineer, and Completions Engineer. At Petrotek, his work focuses on new Class I permit applications, injection well workover support, and the analysis of annual mechanical integrity and reservoir testing activities for client submissions to regulatory agencies. Cameron has experience in multiple basins including the Western Anadarko Basin, DJ Basin, Powder River Basin, and Permian Basin.",
       personal: "Cameron attended the University of Denver and graduated with a degree in Finance and was a four-year member of the Lacrosse Team."
@@ -182,7 +162,7 @@ const OurTeam = () => {
       role: "HSE Manager/Permitting Specialist/Wellsite Supervisor",
       education: "A.A., Red Rocks Community College; Safety and Health Specialist in General Industry, Rocky Mountain Education Center",
       tags: ["HSE", "Safety Officer", "Site Supervision", "HAZWOPER"],
-      bio: "Jeremiah has supervised permitting and drilling operations for multiple Class II wells in the DJ Basin. He works with industrial, ISR, and oil and gas clients to provide site supervision for drilling and workover operations, as well as site safety and annual mechanical integrity testing. Jeremiah also serves as the corporate health and safety officer for Petrotek and has specific training in the OHSA 1910 standards, Lockout/tagout, and maintains HAZWOPER certification.",
+      bio: "Jeremiah has supervised permitting and drilling operations for multiple Class II wells in the DJ Basin. He works with industrial, ISR, and oil and gas clients to provide site supervision for drilling and workover operations, as well as site safety and annual mechanical integrity testing. Jeremiah also serves as the corporate health and safety officer for Petrotek and has specific training in the OSHA 1910 standards, Lockout/tagout, and maintains HAZWOPER certification.",
       personal: "In his spare time, he enjoys writing, hunting, and martial arts."
     },
     {
@@ -453,19 +433,6 @@ const OurTeam = () => {
             Contact a Specialist
           </Link>
         </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
       </div>
     </div>
   );

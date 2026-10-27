@@ -1,46 +1,21 @@
 // src/pages/CaptureStorage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
-  CloudRain, 
-  Info, 
   HelpCircle,
   Plus,
   Minus,
   Leaf,
-  ChevronRight,
-  ArrowUp
+  ChevronRight
 } from 'lucide-react';
 
 const CaptureStorage = () => {
   const maroon = "#166534";
   const [openIndex, setOpenIndex] = useState(null);
 
-  // Placeholder Image for CCS - Replace with your specific CCS image
-  const ccsImage = "https://images.unsplash.com/photo-1563964463040-27f0037f5d93?auto=format&fit=crop&q=80&w=1000";
-
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
-  };
-
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
   };
 
   const servicesList = [
@@ -187,12 +162,14 @@ const CaptureStorage = () => {
                   </button>
                   
                   <div 
-                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                      openIndex === index ? 'max-h-[1500px] opacity-100' : 'max-h-0 opacity-0'
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      openIndex === index ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                     }`}
                   >
-                    <div className="px-6 pb-6 pt-2 border-t border-gray-100 text-gray-600 leading-relaxed">
-                      {item.content}
+                    <div className="overflow-hidden">
+                      <div className="px-6 pb-6 pt-2 border-t border-gray-100 text-gray-600 leading-relaxed">
+                        {item.content}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -211,19 +188,6 @@ const CaptureStorage = () => {
                Contact Our CCS Experts <ChevronRight className="ml-2 w-5 h-5" />
              </Link>
           </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
 
         </div>
       </div>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, MapPin, Phone, Mail, Plus, Minus, RotateCcw } from 'lucide-react';
+import { Menu, X, ChevronDown, MapPin, Phone, Plus, Minus, RotateCcw } from 'lucide-react';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
+import BackToTop from './BackToTop';
 
 // --- MOBILE-OPTIMIZED GLOBAL IMAGE MODAL COMPONENT ---
 const ImageModal = ({ src, alt, isOpen, onClose }) => {
@@ -538,6 +539,7 @@ const Layout = () => {
         onClose={closeModal} 
       />
 
+      <BackToTop />
       <Analytics />
       <SpeedInsights />
     </div>

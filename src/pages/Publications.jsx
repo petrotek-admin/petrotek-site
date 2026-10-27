@@ -1,5 +1,5 @@
 // src/pages/Publications.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -8,7 +8,6 @@ import {
   Download, 
   User, 
   Mail,
-  ArrowUp,
   X
 } from 'lucide-react';
 
@@ -20,25 +19,6 @@ const Publications = () => {
   // Modals state
   const [selectedPub, setSelectedPub] = useState(null); // Abstract preview modal
   const [requestPub, setRequestPub] = useState(null);   // Microsoft Form modal
-
-  // Scroll to Top state & handler
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const MS_FORM_BASE_URL = "https://forms.cloud.microsoft/r/8HC3RVypUn";
 
@@ -142,7 +122,7 @@ const Publications = () => {
       abstract: (
         <>
           <p>
-            A successful CCS project often is more about managing/reducing varied and complex project risk than targeted benefits. Project risks include potentially prolonged and costly permit application in an evolving and complex Federal and State regulatory environment. Political risk encompassing CCS project schedule, access to capital, equipment, material, labor and operations costs, necessary infrastructure, rights-of-way, and pore space figures importantly, and access to carbon oxide. Additionally, CCS projects may require substantial expenditures requiring sophisticated capital projects finance and assurance method and structure. High capital and/or operating expenses combined with ongoing mandated Financial Responsibility expectations risk both project operational flexibility and return on capital. Sequestration siting and associated subsurface geology and/or reservoir capacities may not be suitable for carbon oxide injection. Site Area of Review (AOR) extent and orientation can induce risk and potential costs associated with adjacent wells remediation or failure, natural faulting, and geologic strata weakness with possible induced fracturing and/or seismicity. Running the gauntlet of these risks, CCS benefits include tangible tax credits (e.g., 45Q crediting) and carbon-offset credits (e.g., the Western Climate Initiative and Regional Greenhouse Gas Initiative markets) monetization; material reduction in carbon oxides emissions to the atmosphere and regulated reduction in carbon intensity (CI) scores. To best achieve CCS Project benefits, the probability of success for most CCS projects is most impacted by Project Developer and Operator experience with CCS and UIC generally, by Permit Application experience specifically, by familiarity with CCS and UIC technical challenges, and by current and future access to a suitable subsurface reservoir with long-term capacity. The project should be near the carbon oxide generation site with few-to-no fatal flaws in the AOR. Capital, operating, and Financial Assurance costs must be proven feasible for the Project developer via reasonable stress-testing across the range of regulatory, political, financial, technical, technical, and market risks.
+            A successful CCS project often is more about managing/reducing varied and complex project risk than targeted benefits. Project risks include potentially prolonged and costly permit application in an evolving and complex Federal and State regulatory environment. Political risk encompassing CCS project schedule, access to capital, equipment, material, labor and operations costs, necessary infrastructure, rights-of-way, and pore space figures importantly, and access to carbon oxide. Additionally, CCS projects may require substantial expenditures requiring sophisticated capital projects finance and assurance method and structure. High capital and/or operating expenses combined with ongoing mandated Financial Responsibility expectations risk both project operational flexibility and return on capital. Sequestration siting and associated subsurface geology and/or reservoir capacities may not be suitable for carbon oxide injection. Site Area of Review (AOR) extent and orientation can induce risk and potential costs associated with adjacent wells remediation or failure, natural faulting, and geologic strata weakness with possible induced fracturing and/or seismicity. Running the gauntlet of these risks, CCS benefits include tangible tax credits (e.g., 45Q crediting) and carbon-offset credits (e.g., the Western Climate Initiative and Regional Greenhouse Gas Initiative markets) monetization; material reduction in carbon oxides emissions to the atmosphere and regulated reduction in carbon intensity (CI) scores. To best achieve CCS Project benefits, the probability of success for most CCS projects is most impacted by Project Developer and Operator experience with CCS and UIC generally, by Permit Application experience specifically, by familiarity with CCS and UIC technical challenges, and by current and future access to a suitable subsurface reservoir with long-term capacity. The project should be near the carbon oxide generation site with few-to-no fatal flaws in the AOR. Capital, operating, and Financial Assurance costs must be proven feasible for the Project developer via reasonable stress-testing across the range of regulatory, political, financial, technical and market risks.
           </p>
         </>
       ),
@@ -384,7 +364,7 @@ const Publications = () => {
       tags: ["Mining"] 
     },
     { 
-      title: "Wastewater Management at a Proposed Uranium In-situ Recover Project", 
+      title: "Wastewater Management at a Proposed Uranium In-situ Recovery Project", 
       authors: "Fritz, J., Mays, J., and Demuth, H.P.", 
       citation: "at the Western South Dakota Hydrology Conference, April 2014; Rapid City, South Dakota.", 
       year: 2014, 
@@ -430,7 +410,7 @@ const Publications = () => {
     { 
       title: "Innovations in In Situ (ISR) Uranium Development", 
       authors: "Viellenave, J.H. and L. Huffman", 
-      citation: "Annual Meeting of the Society of Mining Engineers, February 26, 2014; Salt lake City, Utah.", 
+      citation: "Annual Meeting of the Society of Mining Engineers, February 26, 2014; Salt Lake City, Utah.", 
       year: 2014, 
       tags: ["Uranium"] 
     },
@@ -937,19 +917,6 @@ const Publications = () => {
             </div>
           </div>
         )}
-
-        {/* Floating Back to Top Button */}
-        <button
-          onClick={scrollToTop}
-          aria-label="Back to top"
-          className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-            showTopBtn 
-              ? 'opacity-100 translate-y-0 pointer-events-auto' 
-              : 'opacity-0 translate-y-4 pointer-events-none'
-          }`}
-        >
-          <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-        </button>
       </div>
     </div>
   );

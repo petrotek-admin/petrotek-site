@@ -1,5 +1,5 @@
 // src/components/OfficeMap.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -19,15 +19,6 @@ const maroonPin = L.divIcon({
   iconAnchor: [0, 0],
   popupAnchor: [0, -32],
 });
-
-// Strips attribution box entirely if unused
-const RemoveLeafletPrefix = () => {
-  const map = useMap();
-  useEffect(() => {
-    map.attributionControl?.setPrefix(false);
-  }, [map]);
-  return null;
-};
 
 // Unified Gesture Controller for both Desktop (Ctrl+Scroll) and Mobile (2-Finger Pan)
 const GestureController = ({ onShowPrompt }) => {
@@ -105,14 +96,13 @@ const GestureController = ({ onShowPrompt }) => {
 const OfficeMap = ({ height = "240px" }) => {
   const position = [39.608276, -105.146385];
   const [promptMessage, setPromptMessage] = useState("");
+  const timeoutRef = useRef(null);
 
-  const triggerPrompt = (msg) => {
+  const triggerPrompt = useCallback((msg) => {
     setPromptMessage(msg);
-    clearTimeout(window._mapPromptTimeout);
-    window._mapPromptTimeout = setTimeout(() => {
-      setPromptMessage("");
-    }, 1500);
-  };
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setPromptMessage(""), 1500);
+  }, []);
 
   return (
     <div style={{ height }} className="w-full relative z-0 select-none overflow-hidden touch-pan-y">
@@ -123,15 +113,13 @@ const OfficeMap = ({ height = "240px" }) => {
         doubleClickZoom={true}
         dragging={true}
         touchZoom={true}
-        attributionControl={false}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
           maxZoom={19}
-          attribution=""
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles: <a href="https://www.openstreetmap.fr/">HOT</a>'
         />
-        <RemoveLeafletPrefix />
         
         <Marker position={position} icon={maroonPin}>
           <Popup className="custom-leaflet-popup">

@@ -44,19 +44,6 @@ const OilDerrick = ({ className, style }) => (
   </svg>
 );
 
-// Custom Uranium Icon - Now uses a mask to inherit color
-const UraniumIcon = ({ className, style }) => (
-  <div 
-    className={className}
-    style={{ 
-      ...style, 
-      backgroundColor: 'currentColor',
-      mask: 'url("/database-zap.svg") no-repeat center / contain',
-      WebkitMask: 'url("/database-zap.svg") no-repeat center / contain',
-    }}
-  />
-);
-
 const IndustryCard = ({ item, maroon, onInquire }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);

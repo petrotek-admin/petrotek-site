@@ -241,18 +241,11 @@ const Layout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isServicesExpanded, setIsServicesExpanded] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [modalData, setModalData] = useState({ isOpen: false, src: '', alt: '' });
   
   const navigate = useNavigate();
   const location = useLocation();
   const maroon = "#972037";
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Global Image Click Listener
   useEffect(() => {
@@ -311,7 +304,7 @@ const Layout = () => {
   `;
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 flex flex-col overflow-self-start">
+    <div className="min-h-screen bg-white font-sans text-gray-900 flex flex-col">
       
       <nav className={navClass}>
         <div className="w-full px-6 md:px-12 [@media(min-width:1600px)]:px-40 mx-auto max-w-[2000px] flex justify-between items-center">

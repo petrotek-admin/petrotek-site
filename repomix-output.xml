@@ -40,9 +40,6 @@ The content is organized as follows:
 </file_summary>
 
 <directory_structure>
-.github/
-  workflows/
-    deploy.yml
 api/
   contact.js
 public/
@@ -69,11 +66,9 @@ public/
   regular-oil-well.svg
   safety.jpg
   Uranium-ISR-Model-Sim.jpg
-  vite.svg
 src/
-  assets/
-    react.svg
   components/
+    BackToTop.jsx
     Layout.jsx
     OfficeMap.jsx
     ScrollToTop.jsx
@@ -81,15 +76,12 @@ src/
     CaptureStorage.jsx
     Home.jsx
     InjectionWells.jsx
-    ISR.jsx
     Leachate.jsx
-    Mining.jsx
     MiningAndISR.jsx
     OilGas.jsx
     Publications.jsx
     Safety.jsx
     Team.jsx
-  App.css
   App.jsx
   index.css
   main.jsx
@@ -98,9 +90,7 @@ src/
 eslint.config.js
 index.html
 package.json
-postcss.config.js
 README.md
-tailwind.config.js
 vercel.json
 vite.config.js
 </directory_structure>
@@ -108,104 +98,93 @@ vite.config.js
 <files>
 This section contains the contents of the repository's files.
 
-<file path=".github/workflows/deploy.yml">
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: ["main"]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-jobs:
-  build_site:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
-      - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
-
-  deploy:
-    needs: build_site
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
-</file>
-
 <file path="api/contact.js">
 // api/contact.js
 import nodemailer from 'nodemailer';
+
+const escapeHtml = (value = '') =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const oneLine = (value = '') => String(value).replace(/[\r\n]+/g, ' ').trim();
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { firstName, lastName, email, message } = req.body;
+  const { firstName, lastName, email, message, token } = req.body || {};
 
   if (!email || !message) {
     return res.status(400).json({ error: 'Email and message fields are required.' });
   }
+  if (!token) {
+    return res.status(400).json({ error: 'reCAPTCHA verification is required.' });
+  }
 
-  const user = process.env.OUTLOOK_USER;       // e.g. contact_pc@petrotek.com or petrotekadmin@petrotek.com
-  const pass = process.env.OUTLOOK_PASSWORD;   // Dedicated password or App Password
+  // 1. Verify reCAPTCHA on the server
+  const recaptchaSecret = process.env.RECAPTCHA_SECRET;
+  if (!recaptchaSecret) {
+    console.error('Missing RECAPTCHA_SECRET environment variable.');
+    return res.status(500).json({ error: 'Server is not configured correctly.' });
+  }
+
+  try {
+    const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret: recaptchaSecret, response: token }),
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyData.success) {
+      return res.status(400).json({ error: 'reCAPTCHA verification failed. Please try again.' });
+    }
+  } catch (err) {
+    console.error('reCAPTCHA verification error:', err);
+    return res.status(500).json({ error: 'Could not verify reCAPTCHA.' });
+  }
+
+  // 2. Send the email
+  const user = process.env.OUTLOOK_USER;
+  const pass = process.env.OUTLOOK_PASSWORD;
 
   if (!user || !pass) {
     console.error('Missing Outlook credentials in environment variables.');
-    return res.status(500).json({ error: 'Mail server credentials are not configured.' });
+    return res.status(500).json({ error: 'Server is not configured correctly.' });
   }
 
-  // Configure official Microsoft 365 SMTP relay
   const transporter = nodemailer.createTransport({
     host: 'smtp.office365.com',
     port: 587,
-    secure: false, // TLS via STARTTLS
-    auth: {
-      user: user,
-      pass: pass,
-    },
-    tls: {
-      ciphers: 'SSLv3',
-      rejectUnauthorized: false,
-    },
+    secure: false, // upgrades to TLS automatically (STARTTLS)
+    auth: { user, pass },
   });
+
+  const safeFirst = escapeHtml(firstName);
+  const safeLast = escapeHtml(lastName);
+  const safeEmail = escapeHtml(email);
+  const safeMessage = escapeHtml(message);
 
   try {
     await transporter.sendMail({
       from: `"Petrotek Web Inquiry" <${user}>`,
       to: 'contactus@petrotek.com',
-      replyTo: email, // Clicking 'Reply' in Outlook replies directly to the client
-      subject: `New Website Inquiry: ${firstName || ''} ${lastName || ''}`.trim(),
+      replyTo: oneLine(email),
+      subject: oneLine(`New Website Inquiry: ${firstName || ''} ${lastName || ''}`),
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222; max-width: 600px;">
           <h2 style="color: #972037; border-bottom: 2px solid #972037; padding-bottom: 8px;">
             New Website Contact Form Submission
           </h2>
-          <p><strong>Name:</strong> ${firstName || ''} ${lastName || ''}</p>
-          <p><strong>Email:</strong> <a href="mailto:${email}" style="color: #972037;">${email}</a></p>
+          <p><strong>Name:</strong> ${safeFirst} ${safeLast}</p>
+          <p><strong>Email:</strong> <a href="mailto:${safeEmail}" style="color: #972037;">${safeEmail}</a></p>
           <div style="margin-top: 16px; padding: 12px; background-color: #f9f9f9; border-left: 4px solid #972037; border-radius: 4px;">
             <p style="margin: 0; font-weight: bold;">Message:</p>
-            <p style="margin-top: 8px; white-space: pre-wrap;">${message}</p>
+            <p style="margin-top: 8px; white-space: pre-wrap;">${safeMessage}</p>
           </div>
         </div>
       `,
@@ -214,7 +193,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error('SMTP Delivery Error:', error);
-    return res.status(500).json({ error: error.message || 'Failed to send email via Outlook.' });
+    return res.status(500).json({ error: 'Failed to send your message. Please try again later.' });
   }
 }
 </file>
@@ -245,20 +224,42 @@ export default async function handler(req, res) {
 </svg>
 </file>
 
-<file path="public/vite.svg">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
-</file>
+<file path="src/components/BackToTop.jsx">
+import React, { useState, useEffect } from 'react';
+import { ArrowUp } from 'lucide-react';
 
-<file path="src/assets/react.svg">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+const BackToTop = () => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      aria-label="Back to top"
+      className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
+        visible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+      }`}
+    >
+      <ArrowUp className="w-5 h-5" />
+    </button>
+  );
+};
+
+export default BackToTop;
 </file>
 
 <file path="src/components/Layout.jsx">
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, MapPin, Phone, Mail, Plus, Minus, RotateCcw } from 'lucide-react';
+import { Menu, X, ChevronDown, MapPin, Phone, Plus, Minus, RotateCcw } from 'lucide-react';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
+import BackToTop from './BackToTop';
 
 // --- MOBILE-OPTIMIZED GLOBAL IMAGE MODAL COMPONENT ---
 const ImageModal = ({ src, alt, isOpen, onClose }) => {
@@ -794,6 +795,7 @@ const Layout = () => {
         onClose={closeModal} 
       />
 
+      <BackToTop />
       <Analytics />
       <SpeedInsights />
     </div>
@@ -805,7 +807,7 @@ export default Layout;
 
 <file path="src/components/OfficeMap.jsx">
 // src/components/OfficeMap.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -825,15 +827,6 @@ const maroonPin = L.divIcon({
   iconAnchor: [0, 0],
   popupAnchor: [0, -32],
 });
-
-// Strips attribution box entirely if unused
-const RemoveLeafletPrefix = () => {
-  const map = useMap();
-  useEffect(() => {
-    map.attributionControl?.setPrefix(false);
-  }, [map]);
-  return null;
-};
 
 // Unified Gesture Controller for both Desktop (Ctrl+Scroll) and Mobile (2-Finger Pan)
 const GestureController = ({ onShowPrompt }) => {
@@ -911,14 +904,13 @@ const GestureController = ({ onShowPrompt }) => {
 const OfficeMap = ({ height = "240px" }) => {
   const position = [39.608276, -105.146385];
   const [promptMessage, setPromptMessage] = useState("");
+  const timeoutRef = useRef(null);
 
-  const triggerPrompt = (msg) => {
+  const triggerPrompt = useCallback((msg) => {
     setPromptMessage(msg);
-    clearTimeout(window._mapPromptTimeout);
-    window._mapPromptTimeout = setTimeout(() => {
-      setPromptMessage("");
-    }, 1500);
-  };
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setPromptMessage(""), 1500);
+  }, []);
 
   return (
     <div style={{ height }} className="w-full relative z-0 select-none overflow-hidden touch-pan-y">
@@ -929,15 +921,13 @@ const OfficeMap = ({ height = "240px" }) => {
         doubleClickZoom={true}
         dragging={true}
         touchZoom={true}
-        attributionControl={false}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
           maxZoom={19}
-          attribution=""
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles: <a href="https://www.openstreetmap.fr/">HOT</a>'
         />
-        <RemoveLeafletPrefix />
         
         <Marker position={position} icon={maroonPin}>
           <Popup className="custom-leaflet-popup">
@@ -977,60 +967,34 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [pathname]);
 
   return null;
 };
 
-// This line below is what was missing!
 export default ScrollToTop;
 </file>
 
 <file path="src/pages/CaptureStorage.jsx">
 // src/pages/CaptureStorage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
-  CloudRain, 
-  Info, 
   HelpCircle,
   Plus,
   Minus,
   Leaf,
-  ChevronRight,
-  ArrowUp
+  ChevronRight
 } from 'lucide-react';
 
 const CaptureStorage = () => {
   const maroon = "#166534";
   const [openIndex, setOpenIndex] = useState(null);
 
-  // Placeholder Image for CCS - Replace with your specific CCS image
-  const ccsImage = "https://images.unsplash.com/photo-1563964463040-27f0037f5d93?auto=format&fit=crop&q=80&w=1000";
-
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
-  };
-
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
   };
 
   const servicesList = [
@@ -1177,12 +1141,14 @@ const CaptureStorage = () => {
                   </button>
                   
                   <div 
-                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                      openIndex === index ? 'max-h-[1500px] opacity-100' : 'max-h-0 opacity-0'
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      openIndex === index ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                     }`}
                   >
-                    <div className="px-6 pb-6 pt-2 border-t border-gray-100 text-gray-600 leading-relaxed">
-                      {item.content}
+                    <div className="overflow-hidden">
+                      <div className="px-6 pb-6 pt-2 border-t border-gray-100 text-gray-600 leading-relaxed">
+                        {item.content}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1202,19 +1168,6 @@ const CaptureStorage = () => {
              </Link>
           </div>
 
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
-
         </div>
       </div>
     </div>
@@ -1229,7 +1182,6 @@ export default CaptureStorage;
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  ChevronDown, 
   ChevronRight, 
   Globe, 
   Activity, 
@@ -1238,18 +1190,14 @@ import {
   Phone, 
   Mail,
   Droplet,
-  CloudRain,
   HardHat,
   Pickaxe,
   Recycle,
-  Rotate3d,
   Leaf,
-  ArrowUp,
   ArrowRight,
   ArrowDown
 } from 'lucide-react';
 import ReCAPTCHA from "react-google-recaptcha";
-import emailjs from '@emailjs/browser';
 import OfficeMap from '../components/OfficeMap';
 
 // Custom Oil Derrick Icon - Built to match Lucide's stroke style
@@ -1351,12 +1299,10 @@ const IndustryCard = ({ item, maroon, onInquire }) => {
 };
 
 const Home = () => {
-  const [scrollOffset, setScrollOffset] = useState(0);
   const [activeSection, setActiveSection] = useState("home");
   const recaptchaRef = useRef();
 
   useEffect(() => {
-    const handleScroll = () => setScrollOffset(window.scrollY > 500 ? 501 : 0);
 
     const observerOptions = {
       root: null,
@@ -1376,34 +1322,13 @@ const Home = () => {
     const sections = document.querySelectorAll('header[id], section[id]');
     sections.forEach((section) => observer.observe(section));
 
-    window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
   }, []);
 
   const scrollToId = (id) => {
-    const element = document.getElementById(id.replace('#', ''));
-    if (element) {
-      const offset = 100;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    document.getElementById(id.replace('#', ''))?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const [counts, setCounts] = useState({ clients: 0, projects: 0 });
@@ -1448,6 +1373,7 @@ const handleFormSubmit = async (e) => {
       lastName: e.target.lastName.value,
       email: e.target.email.value,
       message: e.target.message.value,
+      token
     };
 
     try {
@@ -2042,19 +1968,6 @@ const handleFormSubmit = async (e) => {
           </div>
         </div>
       </section>
-      {/* Floating Back-to-Top Button */}
-      <button
-        onClick={scrollToTop}
-        aria-label="Back to top"
-        className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white ${
-          scrollOffset > 500
-            ? 'opacity-100 translate-y-0 pointer-events-auto'
-            : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}
-        style={{ backgroundColor: maroon }}
-      >
-        <ArrowUp className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
-      </button>
     </>
   );
 };
@@ -2064,7 +1977,7 @@ export default Home;
 
 <file path="src/pages/InjectionWells.jsx">
 // src/pages/InjectionWells.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -2943,25 +2856,6 @@ const InjectionWells = () => {
   // Dynamic Theme Colors: Dark Blue for Non-Hazardous, Dark Orange for Hazardous
   const themeColor = activeTab === 'non-hazardous' ? '#1E40AF' : '#C2410C';
 
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
   // Dedicated accordion states
   const [nonHazTechOpenIndex, setNonHazTechOpenIndex] = useState(null);
   const [nonHazFyiOpenIndex, setNonHazFyiOpenIndex] = useState(null);
@@ -3063,21 +2957,6 @@ const InjectionWells = () => {
               Contact Our Team <ChevronRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
-          
-
         </div>
       </div>
     </div>
@@ -3089,161 +2968,7 @@ const InjectionWells = () => {
 export default InjectionWells;
 </file>
 
-<file path="src/pages/ISR.jsx">
-// src/pages/ISR.jsx
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Layers, 
-  Droplet, 
-  FileCheck, 
-  ChevronRight,
-  CheckCircle2,
-  Activity,
-  Globe2,
-  Beaker,
-  Scale
-} from 'lucide-react';
-
-// Updated to use a mask so it inherits the parent color
-const UraniumIcon = ({ className, style }) => (
-  <div 
-    className={className}
-    style={{ 
-      ...style, 
-      backgroundColor: 'currentColor',
-      mask: 'url("/database-zap.svg") no-repeat center / contain',
-      WebkitMask: 'url("/database-zap.svg") no-repeat center / contain',
-    }} 
-  />
-);
-
-const ISR = () => {
-  const maroon = "#EAB308";
-
-  const isrServices = [
-    { title: "Strategic Planning", icon: <FileCheck className="w-5 h-5" />, items: ["Feasibility studies", "Hydrogeologic support for NI-43-101 (PEA/PFS)", "Expert testimony"] },
-    { title: "Regulatory & Permitting", icon: <Scale className="w-5 h-5" />, items: ["Mining Permits (State level)", "Radioactive Materials Licenses (NRC)", "Aquifer exemption applications"] },
-    { title: "Characterization & Modeling", icon: <Layers className="w-5 h-5" />, items: ["Aquifer characterization and assessments", "Analytical and numerical fate & transport modeling", "Restoration demonstrations"] },
-    { title: "Chemical & Water Management", icon: <Beaker className="w-5 h-5" />, items: ["Geochemical evaluations and modeling", "Wastewater management via Class I disposal wells", "Wellfield fluid control"] }
-  ];
-
-  return (
-    <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
-      <div className="container mx-auto">
-        
-        <div className="max-w-6xl mx-auto">
-
-        {/* Navigation - Back to Home */}
-        <Link to="/" className="flex items-center text-[#8B1E3F] font-bold mb-8 hover:underline group w-fit">
-          <ArrowRight className="rotate-180 w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
-        </Link> 
-
-          {/* Header Section */}
-          <div className="mb-12">
-            <div className="mb-6 p-4 bg-gray-50 inline-block rounded-2xl border border-gray-100 shadow-sm text-[#EAB308]">
-                <UraniumIcon className="w-10 h-10" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">In-Situ Recovery: Uranium & Copper</h1>
-            <p className="text-xl text-[#EAB308] font-bold mb-6">Uniting Fluid Flow, Petroleum Engineering, and Hydrology</p>
-            <div className="w-24 h-1 mb-8" style={{ backgroundColor: maroon }}></div>
-          </div>
-
-          {/* Intro Section with Sticky Image */}
-          <div className="flex flex-col lg:flex-row gap-12 mb-20 items-start">
-            <div className="lg:w-3/5 prose prose-lg max-w-none text-gray-600 leading-relaxed">
-              <p>
-                The in-situ recovery (ISR) industry is unique in that a specific combination of expertise in fluid flow, petroleum engineering, and hydrology is needed for the diverse nature of operations.
-              </p>
-              <br></br>
-              <p>
-                Petrotek currently provides consulting services to <strong>all of the major uranium operators in the U.S.</strong> with production or production visibility, as well as a number of companies in the advanced and junior exploration stages.
-              </p>
-              <div className="my-8 p-6 bg-gray-50 rounded-xl border-l-4" style={{ borderColor: maroon }}>
-                <div className="flex items-center mb-3">
-                  <Globe2 className="w-6 h-6 mr-3" style={{ color: maroon }} />
-                  <h3 className="text-lg font-bold text-gray-900 m-0">Global Technical Support</h3>
-                </div>
-                <p className="text-sm m-0">
-                  Our staff provides technical support for uranium ISR and mining reclamation projects across the globe, including <strong>Australia, Canada, Kazakhstan, Paraguay, South Africa, and Turkey.</strong>
-                </p>
-              </div>
-              <p>
-                We are deeply knowledgeable regarding all federal and state regulatory requirements related to groundwater flow at ISR projects, ensuring that operations remain compliant from exploration through final reclamation.
-              </p>
-            </div>
-
-          {/* Right Column: Image - REMOVED WRAPPER DIV STYLING */}
-              <div className="lg:w-5/5 sticky top-32" >
-                <img 
-                  src="/InSitu Uranium or Copper Recovery-01.png" 
-                  alt="Petrotek Field Operations" 
-                  className="w-full h-auto object-cover" // Changed h-full to h-auto to maintain aspect ratio without wrapper
-                />
-            </div>
-          </div>
-
-          {/* Services Grid */}
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Our ISR Services & Expertise</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {isrServices.map((service, idx) => (
-                <div key={idx} className="p-8 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center mb-6">
-                    <div className="p-2 rounded-lg bg-gray-50 mr-4" style={{ color: maroon }}>
-                      {service.icon}
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900">{service.title}</h3>
-                  </div>
-                  <ul className="space-y-3">
-                    {service.items.map((item, i) => (
-                      <li key={i} className="flex items-start text-gray-700">
-                        <CheckCircle2 className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" style={{ color: maroon }} />
-                        <span className="text-md">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Technical Deep Dive Image/Diagram placeholder */}
-          <div className="mb-20 rounded-2xl overflow-hidden shadow-lg bg-gray-100">
-             <div className="p-1 text-center bg-gray-200 text-gray-500 text-[10px] uppercase tracking-widest font-bold">Uranium ISR Model Simulation</div>
-             <img 
-                src="/Uranium-ISR-Model-Sim.jpg" 
-                alt="Uranium ISR Model Simulation" 
-                className="w-full h-auto object-cover opacity-80"
-             />
-             
-          </div>
-
-          {/* CTA */}
-          <div className="text-center p-12 bg-gray-50 rounded-3xl border border-dashed border-gray-300">
-             <h3 className="text-2xl font-bold mb-6 text-gray-900 m-0">Ready to discuss your ISR project visibility?</h3>
-             <p className="text-gray-600 mb-8 mt-2">Whether you are a major operator or in the junior exploration stage, our hydrogeologists are ready to help.</p>
-             <Link 
-               to="/" 
-               onClick={() => setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100)}
-               className="inline-flex items-center px-8 py-4 bg-[#EAB308] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg"
-             >
-               Consult with our ISR Experts <ChevronRight className="ml-2 w-5 h-5" />
-             </Link>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ISR;
-</file>
-
 <file path="src/pages/Leachate.jsx">
-import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -3254,32 +2979,13 @@ import {
   Recycle,
   Waves,
   Microscope,
-  Zap,
-  ArrowUp
+  Zap
 } from 'lucide-react';
 
 const Leachate = () => {
   // Using a Deep Teal/Green for the Waste Management / Leachate theme
   const themeColor = "#0F766E"; // Teal-600
 
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const leachateServices = [
     { 
@@ -3424,20 +3130,6 @@ const Leachate = () => {
                Speak with a Waste Management Expert <ChevronRight className="ml-2 w-5 h-5" />
              </Link>
           </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
-
         </div>
       </div>
     </div>
@@ -3447,256 +3139,8 @@ const Leachate = () => {
 export default Leachate;
 </file>
 
-<file path="src/pages/Mining.jsx">
-// src/pages/Mining.jsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Pickaxe, 
-  Waves, 
-  FileBarChart, 
-  CheckCircle2, 
-  ChevronRight,
-  TrendingUp,
-  Map,
-  ShieldAlert,
-  Search
-} from 'lucide-react';
-
-const miningExpertise = [
-  { 
-    title: "Compliance & Permitting", 
-    icon: <ShieldAlert className="w-5 h-5" />, 
-    items: ["Preparation of Permit to Mine Applications", "Regulatory compliance support", "RCRA & CERCLA Investigations"] 
-  },
-  { 
-    title: "Hydrogeologic Characterization", 
-    icon: <Waves className="w-5 h-5" />, 
-    items: ["Aquifer characterization and assessment", "Geologic mapping & data interpretation", "Environmental monitoring for active sites"] 
-  },
-  { 
-    title: "Modeling & Remediation", 
-    icon: <FileBarChart className="w-5 h-5" />, 
-    items: ["Groundwater modeling for long-term conditions", "Groundwater remedial design", "Post-operational assessments"] 
-  },
-  { 
-    title: "Strategic Support", 
-    icon: <Search className="w-5 h-5" />, 
-    items: ["Expert witness & litigation support", "Project management", "Water resource evaluations"] 
-  }
-];
-
-// Reusable tab content body
-const MiningContent = ({ maroon }) => (
-  <div>
-    {/* Intro Section with Sticky Image */}
-    <div className="flex flex-col lg:flex-row gap-12 mb-20 items-start">
-      <div className="lg:w-3/5 prose prose-lg max-w-none text-gray-600 leading-relaxed">
-        <p>
-          The Petrotek Team has over one hundred years of combined experience in performing hydrogeologic characterizations for evaluating soil and water impacts.
-        </p>
-        <br />
-        <p>
-          We specialize in assessing ground water and surface water interactions at new and active hard rock mining and mineral processing sites. Our work bridges the gap between complex geology and the stringent requirements of modern environmental stewardship.
-        </p>
-        
-        <div className="my-8 p-6 bg-gray-50 rounded-xl border-l-4" style={{ borderColor: maroon }}>
-          <div className="flex items-center mb-4 text-gray-900">
-            <Map className="mr-3 w-6 h-6" style={{ color: maroon }} />
-            <h3 className="text-lg font-bold m-0">Western U.S. Footprint</h3>
-          </div>
-          <ul className="grid grid-cols-2 gap-2 text-sm m-0 list-none p-0">
-            <li className="flex items-center">
-              <CheckCircle2 className="w-3 h-3 mr-2 text-[#8B1E3F]" /> 
-              <strong className="mr-1">Arizona:</strong> Copper
-            </li>
-            <li className="flex items-center">
-              <CheckCircle2 className="w-3 h-3 mr-2 text-[#8B1E3F]" /> 
-              <strong className="mr-1">New Mexico:</strong> U, Cu, Ag, Au
-            </li>
-            <li className="flex items-center">
-              <CheckCircle2 className="w-3 h-3 mr-2 text-[#8B1E3F]" /> 
-              <strong className="mr-1">Utah:</strong> Uranium
-            </li>
-            <li className="flex items-center">
-              <CheckCircle2 className="w-3 h-3 mr-2 text-[#8B1E3F]" /> 
-              <strong className="mr-1">Colorado:</strong> U, Gold
-            </li>
-            <li className="flex items-center">
-              <CheckCircle2 className="w-3 h-3 mr-2 text-[#8B1E3F]" /> 
-              <strong className="mr-1">Wyoming:</strong> U, Rare Earth
-            </li>
-            <li className="flex items-center">
-              <CheckCircle2 className="w-3 h-3 mr-2 text-[#8B1E3F]" /> 
-              <strong className="mr-1">Montana:</strong> Cu, Ag, Au
-            </li>
-            <li className="flex items-center">
-              <CheckCircle2 className="w-3 h-3 mr-2 text-[#8B1E3F]" /> 
-              <strong className="mr-1">Idaho:</strong> Ag, Pb, Zn
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Right Column: Image */}
-      <div className="lg:w-3/5 sticky top-32">
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
-          <img 
-            src="/mining.jpg" 
-            alt="Petrotek Field Operations" 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
-      </div>
-    </div>
-
-    {/* Expertise Grid */}
-    <div className="mb-20">
-      <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Specific Areas of Expertise</h2>
-      <div className="grid md:grid-cols-2 gap-8">
-        {miningExpertise.map((service, idx) => (
-          <div key={idx} className="p-8 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center mb-6">
-              <div className="p-2 rounded-lg bg-gray-50 mr-4" style={{ color: maroon }}>
-                {service.icon}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">{service.title}</h3>
-            </div>
-            <ul className="space-y-3">
-              {service.items.map((item, i) => (
-                <li key={i} className="flex items-start text-gray-700">
-                  <CheckCircle2 className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" style={{ color: maroon }} />
-                  <span className="text-md">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    {/* Strategic Insight Section */}
-    <div className="bg-gray-900 text-white rounded-3xl p-10 md:p-14 shadow-2xl mb-16 relative overflow-hidden">
-      <div className="relative z-10 grid md:grid-cols-3 gap-8 items-center">
-        <div className="md:col-span-2">
-          <h3 className="text-3xl font-bold mb-4">Proactive Water Management</h3>
-          <p className="text-gray-300 text-lg leading-relaxed mb-6">
-            From baseline studies for new permits to long-term monitoring for active operations and post-operational closures, we provide the technical depth required for the industry's most challenging subsurface environments.
-          </p>
-          <div className="flex items-center space-x-2 text-[#78350F] font-bold">
-            <TrendingUp className="w-5 h-5" />
-            <span>Compliance & Operational Stability</span>
-          </div>
-        </div>
-        <div className="hidden md:flex justify-center">
-          <div className="w-32 h-32 border-4 border-[#78350F] rounded-full flex items-center justify-center">
-            <span className="text-3xl font-bold text-white">100+</span>
-            <span className="text-[10px] absolute mt-12 uppercase tracking-widest text-gray-400">Combined Exp.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const Mining = () => {
-  const maroon = "#78350F";
-  
-  // Tab State: 'operations' | 'hydrogeology'
-  const [activeTab, setActiveTab] = useState('operations');
-
-  return (
-    <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
-      <div className="container mx-auto">
-        <div className="max-w-6xl mx-auto">
-          
-          {/* Navigation - Back to Home */}
-          <Link to="/" className="flex items-center text-[#972037] font-bold mb-8 hover:underline group w-fit">
-            <ArrowRight className="rotate-180 w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home
-          </Link>
-
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="mb-6 p-4 bg-gray-50 inline-block rounded-2xl border border-gray-100 shadow-sm">
-              <Pickaxe className="w-10 h-10" style={{ color: maroon }} />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Mining</h1>
-            <p className="text-xl text-[#78350F] font-bold mb-6">Characterization, Modeling, and Regulatory Compliance</p>
-            <div className="w-24 h-1 mb-8" style={{ backgroundColor: maroon }}></div>
-          </div>
-
-          {/* Tab Selection Navigation */}
-          <div className="flex border-b border-gray-200 mb-12 space-x-2 sm:space-x-4">
-            <button
-              onClick={() => setActiveTab('operations')}
-              className={`pb-4 px-4 sm:px-6 text-base sm:text-lg font-bold flex items-center transition-all relative border-b-2 -mb-[2px] ${
-                activeTab === 'operations'
-                  ? 'border-[#78350F] text-[#78350F]'
-                  : 'border-transparent text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              <Pickaxe 
-                className={`w-5 h-5 mr-2 ${
-                  activeTab === 'operations' ? 'text-[#78350F]' : 'text-gray-400'
-                }`} 
-              />
-              Mining & Operations
-            </button>
-
-            <button
-              onClick={() => setActiveTab('hydrogeology')}
-              className={`pb-4 px-4 sm:px-6 text-base sm:text-lg font-bold flex items-center transition-all relative border-b-2 -mb-[2px] ${
-                activeTab === 'hydrogeology'
-                  ? 'border-[#78350F] text-[#78350F]'
-                  : 'border-transparent text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              <Waves 
-                className={`w-5 h-5 mr-2 ${
-                  activeTab === 'hydrogeology' ? 'text-[#78350F]' : 'text-gray-400'
-                }`} 
-              />
-              Hydrogeology
-            </button>
-          </div>
-
-          {/* Tab Content Display */}
-          {activeTab === 'operations' && (
-            <div className="animate-fadeIn">
-              <MiningContent maroon={maroon} />
-            </div>
-          )}
-
-          {activeTab === 'hydrogeology' && (
-            <div className="animate-fadeIn">
-              <MiningContent maroon={maroon} />
-            </div>
-          )}
-
-          {/* CTA */}
-          <div className="text-center p-12 bg-gray-50 rounded-3xl border border-dashed border-gray-300">
-            <h3 className="text-2xl font-bold mb-6 text-gray-900">Secure your project's hydrologic future.</h3>
-            <Link 
-              to="/" 
-              onClick={() => setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100)}
-              className="inline-flex items-center px-8 py-4 bg-[#78350F] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg"
-            >
-              Contact Our Mining Team <ChevronRight className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Mining;
-</file>
-
 <file path="src/pages/MiningAndISR.jsx">
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -3713,8 +3157,7 @@ import {
   TrendingUp,
   Map,
   ShieldAlert,
-  Search,
-  ArrowUp
+  Search
 } from 'lucide-react';
 
 // Reusable UraniumIcon Component
@@ -3763,25 +3206,6 @@ const MiningAndISR = () => {
     isr: "#EAB308",
     mining: "#78350F",
     maroon: "#972037"
-  };
-
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
   };
 
   const isrServices = [
@@ -4010,20 +3434,6 @@ const MiningAndISR = () => {
               Consult with our {activeTab === 'isr' ? 'ISR' : 'Mining'} Experts <ChevronRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
-
         </div>
       </div>
     </div>
@@ -4035,7 +3445,6 @@ export default MiningAndISR;
 
 <file path="src/pages/OilGas.jsx">
 // src/pages/OilGas.jsx
-import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -4044,8 +3453,7 @@ import {
   CheckCircle2, 
   ChevronRight,
   BarChart3,
-  Droplet,
-  ArrowUp
+  Droplet
 } from 'lucide-react';
 
 // Custom Oil Well Icon - Now uses a mask to inherit color
@@ -4092,25 +3500,6 @@ const OilDerrick = ({ className, style }) => (
 
 const OilGas = () => {
   const maroon = "#972037";
-
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const upstreamServices = [
     { title: "Regulatory & Permitting", icon: <Gavel className="w-5 h-5" />, items: ["Permitting of well drilling and spacing units", "Regulatory hearings and expert testimony", "Correlative rights, pooling and flaring"] },
@@ -4209,7 +3598,7 @@ const OilGas = () => {
               <iframe 
                 className="absolute top-0 left-0 w-full h-full"
                 src="https://www.youtube.com/embed/GCCsw42BVSg?si=4HlN-FaIBTV6WYWc" 
-                title="pstream Oil Field Operations"
+                title="Upstream Oil Field Operations"
                 frameBorder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowFullScreen
@@ -4247,20 +3636,6 @@ const OilGas = () => {
                Consult Our E&P Experts <ChevronRight className="ml-2 w-5 h-5" />
              </Link>
           </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
-
         </div>
       </div>
     </div>
@@ -4272,7 +3647,7 @@ export default OilGas;
 
 <file path="src/pages/Publications.jsx">
 // src/pages/Publications.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -4281,7 +3656,6 @@ import {
   Download, 
   User, 
   Mail,
-  ArrowUp,
   X
 } from 'lucide-react';
 
@@ -4293,25 +3667,6 @@ const Publications = () => {
   // Modals state
   const [selectedPub, setSelectedPub] = useState(null); // Abstract preview modal
   const [requestPub, setRequestPub] = useState(null);   // Microsoft Form modal
-
-  // Scroll to Top state & handler
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const MS_FORM_BASE_URL = "https://forms.cloud.microsoft/r/8HC3RVypUn";
 
@@ -4415,7 +3770,7 @@ const Publications = () => {
       abstract: (
         <>
           <p>
-            A successful CCS project often is more about managing/reducing varied and complex project risk than targeted benefits. Project risks include potentially prolonged and costly permit application in an evolving and complex Federal and State regulatory environment. Political risk encompassing CCS project schedule, access to capital, equipment, material, labor and operations costs, necessary infrastructure, rights-of-way, and pore space figures importantly, and access to carbon oxide. Additionally, CCS projects may require substantial expenditures requiring sophisticated capital projects finance and assurance method and structure. High capital and/or operating expenses combined with ongoing mandated Financial Responsibility expectations risk both project operational flexibility and return on capital. Sequestration siting and associated subsurface geology and/or reservoir capacities may not be suitable for carbon oxide injection. Site Area of Review (AOR) extent and orientation can induce risk and potential costs associated with adjacent wells remediation or failure, natural faulting, and geologic strata weakness with possible induced fracturing and/or seismicity. Running the gauntlet of these risks, CCS benefits include tangible tax credits (e.g., 45Q crediting) and carbon-offset credits (e.g., the Western Climate Initiative and Regional Greenhouse Gas Initiative markets) monetization; material reduction in carbon oxides emissions to the atmosphere and regulated reduction in carbon intensity (CI) scores. To best achieve CCS Project benefits, the probability of success for most CCS projects is most impacted by Project Developer and Operator experience with CCS and UIC generally, by Permit Application experience specifically, by familiarity with CCS and UIC technical challenges, and by current and future access to a suitable subsurface reservoir with long-term capacity. The project should be near the carbon oxide generation site with few-to-no fatal flaws in the AOR. Capital, operating, and Financial Assurance costs must be proven feasible for the Project developer via reasonable stress-testing across the range of regulatory, political, financial, technical, technical, and market risks.
+            A successful CCS project often is more about managing/reducing varied and complex project risk than targeted benefits. Project risks include potentially prolonged and costly permit application in an evolving and complex Federal and State regulatory environment. Political risk encompassing CCS project schedule, access to capital, equipment, material, labor and operations costs, necessary infrastructure, rights-of-way, and pore space figures importantly, and access to carbon oxide. Additionally, CCS projects may require substantial expenditures requiring sophisticated capital projects finance and assurance method and structure. High capital and/or operating expenses combined with ongoing mandated Financial Responsibility expectations risk both project operational flexibility and return on capital. Sequestration siting and associated subsurface geology and/or reservoir capacities may not be suitable for carbon oxide injection. Site Area of Review (AOR) extent and orientation can induce risk and potential costs associated with adjacent wells remediation or failure, natural faulting, and geologic strata weakness with possible induced fracturing and/or seismicity. Running the gauntlet of these risks, CCS benefits include tangible tax credits (e.g., 45Q crediting) and carbon-offset credits (e.g., the Western Climate Initiative and Regional Greenhouse Gas Initiative markets) monetization; material reduction in carbon oxides emissions to the atmosphere and regulated reduction in carbon intensity (CI) scores. To best achieve CCS Project benefits, the probability of success for most CCS projects is most impacted by Project Developer and Operator experience with CCS and UIC generally, by Permit Application experience specifically, by familiarity with CCS and UIC technical challenges, and by current and future access to a suitable subsurface reservoir with long-term capacity. The project should be near the carbon oxide generation site with few-to-no fatal flaws in the AOR. Capital, operating, and Financial Assurance costs must be proven feasible for the Project developer via reasonable stress-testing across the range of regulatory, political, financial, technical and market risks.
           </p>
         </>
       ),
@@ -4657,7 +4012,7 @@ const Publications = () => {
       tags: ["Mining"] 
     },
     { 
-      title: "Wastewater Management at a Proposed Uranium In-situ Recover Project", 
+      title: "Wastewater Management at a Proposed Uranium In-situ Recovery Project", 
       authors: "Fritz, J., Mays, J., and Demuth, H.P.", 
       citation: "at the Western South Dakota Hydrology Conference, April 2014; Rapid City, South Dakota.", 
       year: 2014, 
@@ -4703,7 +4058,7 @@ const Publications = () => {
     { 
       title: "Innovations in In Situ (ISR) Uranium Development", 
       authors: "Viellenave, J.H. and L. Huffman", 
-      citation: "Annual Meeting of the Society of Mining Engineers, February 26, 2014; Salt lake City, Utah.", 
+      citation: "Annual Meeting of the Society of Mining Engineers, February 26, 2014; Salt Lake City, Utah.", 
       year: 2014, 
       tags: ["Uranium"] 
     },
@@ -5210,19 +4565,6 @@ const Publications = () => {
             </div>
           </div>
         )}
-
-        {/* Floating Back to Top Button */}
-        <button
-          onClick={scrollToTop}
-          aria-label="Back to top"
-          className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-            showTopBtn 
-              ? 'opacity-100 translate-y-0 pointer-events-auto' 
-              : 'opacity-0 translate-y-4 pointer-events-none'
-          }`}
-        >
-          <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-        </button>
       </div>
     </div>
   );
@@ -5239,39 +4581,15 @@ import {
   ArrowRight, 
   HardHat, 
   ShieldCheck, 
-  FileCheck, 
   AlertTriangle, 
-  Users, 
-  CheckCircle2, 
+  Users,  
   ChevronRight,
-  Stethoscope,
-  Trophy,
   Search,
-  Activity,
-  ArrowUp
+  Activity
 } from 'lucide-react';
 
 const Safety = () => {
   const maroon = "#F97316";
-
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const safetyCommitments = [
     { title: "Wellsite Excellence", icon: <HardHat className="w-5 h-5" />, text: "Maintain safe and healthy wellsite workplaces for our employees, contractors, and clients." },
@@ -5416,20 +4734,6 @@ const Safety = () => {
                Contact Our HSE Team <ChevronRight className="ml-2 w-5 h-5" />
              </Link>
           </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
-
         </div>
       </div>
     </div>
@@ -5440,7 +4744,7 @@ export default Safety;
 </file>
 
 <file path="src/pages/Team.jsx">
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -5449,8 +4753,7 @@ import {
   X,
   ChevronRight,
   Scale,
-  History,
-  ArrowUp
+  History
 } from 'lucide-react';
 
 const OurTeam = () => {
@@ -5458,25 +4761,6 @@ const OurTeam = () => {
   // Logic: searchTerm state has been removed
   const [selectedMember, setSelectedMember] = useState(null);
   const [showCredits, setShowCredits] = useState(false);
-
-  // --- Scroll to Top state & handler ---
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      setShowTopBtn(window.scrollY > 400);
-    };
-
-    window.addEventListener('scroll', checkScroll);
-    return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const teamData = [
     {
@@ -5486,7 +4770,7 @@ const OurTeam = () => {
       tags: ["Geology", "Field Operations", "Corporate Operations", "Contract Negotiations"],
       bio: (
       <>
-        <p>Wes is one of the managing principals of Petrotek and serves as Director of Field Operations. He holds a B.S. degree in Geology from the University of South Alabama. Wes has more than twenty years of experience with wellsite field work and the application of geology to permitting for all classes of injection well projects. He also has experience in contract negotiations, business relationship optimization, and Corporate operations. His Field Director position includes supervising complex projects and operations along with well drilling, completion, testing and stimulation work throughout the country. He regularly leads staff to get efficient results for clients in feasibility and permitting efforts. Wes has been actively involved in all facets of the permitting, design, installation, sampling, testing, maintenance, and remediation of disposal wells across thecountry.</p> 
+        <p>Wes is one of the managing principals of Petrotek and serves as Director of Field Operations. He holds a B.S. degree in Geology from the University of South Alabama. Wes has more than twenty years of experience with wellsite field work and the application of geology to permitting for all classes of injection well projects. He also has experience in contract negotiations, business relationship optimization, and Corporate operations. His Field Director position includes supervising complex projects and operations along with well drilling, completion, testing and stimulation work throughout the country. He regularly leads staff to get efficient results for clients in feasibility and permitting efforts. Wes has been actively involved in all facets of the permitting, design, installation, sampling, testing, maintenance, and remediation of disposal wells across the country.</p> 
         <br></br>
         <p>Wes is an active member of the Rocky Mountain Association of Geologists, the Society of Petroleum Engineers, the American Association of Petroleum Geologists, and is a Licensed Professional Geologist in Wyoming, Indiana, Kansas, Nebraska, Texas, Louisiana, Illinois, Florida, and Utah. He has published and given a variety of talks regarding subsurface injection, and is an active member of the Rocky Mountain Association of Geologists, the Society of Petroleum Engineers, and the American Association of Petroleum Geologists.</p>
       </>
@@ -5519,8 +4803,8 @@ const OurTeam = () => {
       name: "David Huffington, M.S., P.G.",
       role: "Principal, Managing Geologist",
       education: "B.S. Geophysical Engineering, Colorado School of Mines; M.S. Petroleum Reservoir Systems, Colorado School of Mines",
-      tags: ["Geologic Feasability", "Wireline", "Geologic Testimony", "Cased Hole Logs"],
-      bio: "David is a Senior Geologist at Petrotek Corporation with more than ten years of industry experience. He holds Professional Geology licenses in multiple states. His work primarily focuses on injection well feasibility studies, new Class I, Class II, and Class VI permits, Class I permit renewals, land ban petition exemption renewals, mechanical integrity testing, drilling, and geologic testimony. David has designed, supervised, and interpreted many different types of mechanical integrity tests in a wide variety of well circumstances. Prior to Petrotek, David worked for Halliburton as a wireline field engineer, running a variety of cased hole logs including pulse neutron, cement evaluation, flow profiles, perforating, and casing cuts. David Has a Bachelor of Science in Geophysical Engineering and a Master’s degree in Petroleum Reservoir Systems from the Colorado School of Mines.",
+      tags: ["Geologic Feasibility", "Wireline", "Geologic Testimony", "Cased Hole Logs"],
+      bio: "David is a Senior Geologist at Petrotek Corporation with more than ten years of industry experience. He holds Professional Geology licenses in multiple states. His work primarily focuses on injection well feasibility studies, new Class I, Class II, and Class VI permits, Class I permit renewals, land ban petition exemption renewals, mechanical integrity testing, drilling, and geologic testimony. David has designed, supervised, and interpreted many different types of mechanical integrity tests in a wide variety of well circumstances. Prior to Petrotek, David worked for Halliburton as a wireline field engineer, running a variety of cased hole logs including pulse neutron, cement evaluation, flow profiles, perforating, and casing cuts. David has a Bachelor of Science in Geophysical Engineering and a Master’s degree in Petroleum Reservoir Systems from the Colorado School of Mines.",
       personal: "David is a member of the Society of Petrophysicists and Well Log Analysts, Rocky Mountain Association of Geologists, and the Denver Well Logging Society."
     },
     {
@@ -5590,7 +4874,7 @@ const OurTeam = () => {
     {
       name: "Cameron Kerr, B.S.",
       role: "Project Engineer",
-      education: "B.S. Petroleum Engineering, Colorado School of Mines; B.S. Business Adminstration, University of Denver",
+      education: "B.S. Petroleum Engineering, Colorado School of Mines; B.S. Business Administration, University of Denver",
       tags: ["Production", "Completions", "Workover Support", "Basin Analysis"],
       bio: "Following graduation from Mines, Cameron spent time in the oil and gas space as a Production Engineer, Field Frac Engineer, and Completions Engineer. At Petrotek, his work focuses on new Class I permit applications, injection well workover support, and the analysis of annual mechanical integrity and reservoir testing activities for client submissions to regulatory agencies. Cameron has experience in multiple basins including the Western Anadarko Basin, DJ Basin, Powder River Basin, and Permian Basin.",
       personal: "Cameron attended the University of Denver and graduated with a degree in Finance and was a four-year member of the Lacrosse Team."
@@ -5624,7 +4908,7 @@ const OurTeam = () => {
       role: "HSE Manager/Permitting Specialist/Wellsite Supervisor",
       education: "A.A., Red Rocks Community College; Safety and Health Specialist in General Industry, Rocky Mountain Education Center",
       tags: ["HSE", "Safety Officer", "Site Supervision", "HAZWOPER"],
-      bio: "Jeremiah has supervised permitting and drilling operations for multiple Class II wells in the DJ Basin. He works with industrial, ISR, and oil and gas clients to provide site supervision for drilling and workover operations, as well as site safety and annual mechanical integrity testing. Jeremiah also serves as the corporate health and safety officer for Petrotek and has specific training in the OHSA 1910 standards, Lockout/tagout, and maintains HAZWOPER certification.",
+      bio: "Jeremiah has supervised permitting and drilling operations for multiple Class II wells in the DJ Basin. He works with industrial, ISR, and oil and gas clients to provide site supervision for drilling and workover operations, as well as site safety and annual mechanical integrity testing. Jeremiah also serves as the corporate health and safety officer for Petrotek and has specific training in the OSHA 1910 standards, Lockout/tagout, and maintains HAZWOPER certification.",
       personal: "In his spare time, he enjoys writing, hunting, and martial arts."
     },
     {
@@ -5895,70 +5179,12 @@ const OurTeam = () => {
             Contact a Specialist
           </Link>
         </div>
-
-          {/* Floating Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className={`fixed bottom-6 right-6 z-40 p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 text-white bg-[#972037] hover:brightness-110 ${
-              showTopBtn 
-                ? 'opacity-100 translate-y-0 pointer-events-auto' 
-                : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <ArrowUp className="w-5 h-5 transition-transform hover:-translate-y-0.5" />
-          </button>
       </div>
     </div>
   );
 };
 
 export default OurTeam;
-</file>
-
-<file path="src/App.css">
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
 </file>
 
 <file path="src/App.jsx">
@@ -6014,42 +5240,21 @@ export default App;
 
 <file path="src/index.css">
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --container-8xl: 90rem;
+  --container-9xl: 96rem;
+
+  --animate-fadeIn: fadeIn 0.4s ease-out;
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+  }
+}
 
 html {
   scroll-behavior: smooth;
-}
-
-@keyframes marqueeVertical {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
-}
-.animate-marquee-vertical {
-  display: flex;
-  flex-direction: column;
-  animation: marqueeVertical 30s linear infinite;
-}
-.animate-marquee-vertical:hover {
-  animation-play-state: paused;
-}
-
-@layer components {
-  .glass-card {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
-  }
-  
-  .glass-dark {
-    @apply bg-black/40 backdrop-blur-lg border border-white/10 shadow-2xl;
-  }
-
-  /* Smooth reveal for glassy elements */
-  .glass-reveal {
-    animation: glassReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  @keyframes glassReveal {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
 }
 </file>
 
@@ -6253,8 +5458,9 @@ export default defineConfig([
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/Petrotek Favicon.png" />
+    <link rel="icon" type="image/png" href="/Petrotek Favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Petrotek Corporation provides injection well, UIC permitting, mining, oil and gas, and carbon capture consulting services." />
     <title>Petrotek Corporation</title>
   </head>
   <body>
@@ -6277,8 +5483,6 @@ export default defineConfig([
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
-    "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
     "@vercel/analytics": "^1.6.1",
     "@vercel/speed-insights": "^1.3.1",
@@ -6289,32 +5493,21 @@ export default defineConfig([
     "react-google-recaptcha": "^3.1.0",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.13.0",
-    "resend": "^6.34.1"
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "autoprefixer": "^10.4.24",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "lucide-react": "^0.563.0",
-    "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
     "vite": "^7.3.1"
   }
-}
-</file>
-
-<file path="postcss.config.js">
-export default {
-  plugins: {
-    "@tailwindcss/postcss": {},
-    autoprefixer: {},
-  },
 }
 </file>
 
@@ -6335,32 +5528,6 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-</file>
-
-<file path="tailwind.config.js">
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {
-      screens: {
-          '2k': '2000px',
-          '4k': '3800px',
-        },
-        maxWidth: {
-          '8xl': '90rem',
-          '9xl': '96rem',
-        },
-      colors: {
-        maroon: '#8B1E3F',
-      }
-    },
-  },
-  plugins: [],
-}
 </file>
 
 <file path="vercel.json">

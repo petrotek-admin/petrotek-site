@@ -15,3 +15,16 @@
 html {
   scroll-behavior: smooth;
 }
+
+@keyframes marqueeVertical {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.animate-marquee-vertical {
+  display: flex;
+  flex-direction: column;
+  animation: marqueeVertical 30s linear infinite;
+}
+.animate-marquee-vertical:hover {
+  animation-play-state: paused;
+}

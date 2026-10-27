@@ -17,8 +17,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Layers,
-  Briefcase,
-  ArrowUp
+  Briefcase
 } from 'lucide-react';
 
 /* =========================================================================
@@ -380,7 +379,7 @@ const NonHazardousContent = ({
             
             <div 
               className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                techOpenIndex === index ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                techOpenIndex === index ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
               <div className="px-6 pb-6 pt-2 border-t border-gray-100">
@@ -806,7 +805,7 @@ const HazardousContent = ({
             
             <div 
               className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                techOpenIndex === index ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                techOpenIndex === index ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
               <div className="px-6 pb-6 pt-2 border-t border-gray-100">

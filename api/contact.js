@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   try {
     await transporter.sendMail({
       from: `"Petrotek Web Inquiry" <${user}>`,
-      to: 'petrotekadmin@petrotek.com',
+      to: 'contactus@petrotek.com',
       replyTo: email, // Clicking 'Reply' in Outlook replies directly to the client
       subject: `New Website Inquiry: ${firstName || ''} ${lastName || ''}`.trim(),
       html: `

@@ -15,7 +15,9 @@ import {
   Recycle,
   Leaf,
   ArrowRight,
-  ArrowDown
+  ArrowDown,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import ReCAPTCHA from "react-google-recaptcha";
 import OfficeMap from '../components/OfficeMap';
@@ -167,22 +169,32 @@ const Home = () => {
     }
   }, [activeSection, hasCounted]);
 
-const handleFormSubmit = async (e) => {
+  const [status, setStatus] = useState('idle'); // 'idle' | 'sending' | 'success' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (status === 'sending') return; // ignore extra clicks
+
+    const form = e.currentTarget;
 
     const token = recaptchaRef.current?.getValue();
     if (!token) {
-      alert("Please complete the reCAPTCHA verification.");
+      setErrorMessage('Please complete the reCAPTCHA verification.');
+      setStatus('error');
       return;
     }
 
     const payload = {
-      firstName: e.target.firstName.value,
-      lastName: e.target.lastName.value,
-      email: e.target.email.value,
-      message: e.target.message.value,
+      firstName: form.firstName.value,
+      lastName: form.lastName.value,
+      email: form.email.value,
+      message: form.message.value,
       token
     };
+
+    setErrorMessage('');
+    setStatus('sending');
 
     try {
       const res = await fetch("/api/contact", {
@@ -200,12 +212,14 @@ const handleFormSubmit = async (e) => {
         throw new Error(data.error || `Server responded with status ${res.status}`);
       }
 
-      alert("Message sent! We will be in touch soon.");
-      e.target.reset();
+      form.reset();
       recaptchaRef.current?.reset();
+      setStatus('success');
     } catch (err) {
       console.error("Form submission error:", err);
-      alert(`Submission failed: ${err.message}`);
+      recaptchaRef.current?.reset();
+      setErrorMessage(err.message || 'Something went wrong. Please try again.');
+      setStatus('error');
     }
   };
 
@@ -709,7 +723,7 @@ const handleFormSubmit = async (e) => {
 
             {/* Form Right Panel */}
             <form 
-              className="lg:col-span-3 p-6 sm:p-10 lg:p-12 flex flex-col justify-between h-full space-y-5" 
+              className="relative lg:col-span-3 p-6 sm:p-10 lg:p-12 flex flex-col justify-between h-full space-y-5"
               onSubmit={handleFormSubmit}
             >
               <div className="space-y-5 flex-1 flex flex-col">
@@ -765,14 +779,64 @@ const handleFormSubmit = async (e) => {
                   )}
                 </div>
 
+                {status === 'error' && errorMessage && (
+                  <div role="alert" className="flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
                 <button 
                   type="submit" 
-                  className="w-full py-4 text-white text-xs sm:text-sm font-bold rounded-lg uppercase tracking-widest shadow-md hover:brightness-110 active:scale-[0.99] transition-all" 
+                  disabled={status === 'sending'}
+                  className="w-full py-4 text-white text-xs sm:text-sm font-bold rounded-lg uppercase tracking-widest shadow-md hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100" 
                   style={{ backgroundColor: maroon }}
                 >
-                  Send Message
+                  {status === 'sending' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    'Send Message'
+                  )}
                 </button>
               </div>
+              {/* Success confirmation overlay */}
+              {status === 'success' && (
+                <div
+                  role="status"
+                  className="absolute inset-0 z-10 bg-white flex flex-col items-center justify-center text-center p-8 animate-in fade-in duration-500"
+                >
+                  <div className="w-24 h-24 mb-6 animate-in zoom-in-50 duration-500">
+                    <svg viewBox="0 0 52 52" className="w-full h-full">
+                      <circle cx="26" cy="26" r="24" fill="none" stroke={maroon} strokeWidth="3" opacity="0.2" />
+                      <circle cx="26" cy="26" r="24" fill={maroon} opacity="0.08" />
+                      <path
+                        className="animate-draw-check"
+                        d="M14 27l8 8 16-16"
+                        fill="none"
+                        stroke={maroon}
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-extrabold text-gray-900 mb-2">Message Sent</h3>
+                  <p className="text-gray-600 max-w-sm mb-8">
+                    Thank you for reaching out. A member of our team will be in touch soon.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setStatus('idle')}
+                    className="text-xs font-bold uppercase tracking-widest border-b-2 pb-0.5 hover:opacity-70 transition-opacity"
+                    style={{ color: maroon, borderColor: maroon }}
+                  >
+                    Send another message
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         </div>

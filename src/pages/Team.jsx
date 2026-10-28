@@ -422,8 +422,8 @@ const OurTeam = () => {
           <Link 
             to="/" 
             onClick={() => setTimeout(() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'}), 100)}
-            className="px-8 py-4 bg-[#972037] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg shrink-0"
-          >
+            className="inline-flex items-center px-8 py-4 bg-[#972037] text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-lg"
+            >
             Contact a Specialist
           </Link>
         </div>

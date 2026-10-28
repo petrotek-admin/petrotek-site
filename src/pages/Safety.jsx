@@ -1,6 +1,7 @@
 // src/pages/Safety.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   ArrowRight, 
   HardHat, 
@@ -26,6 +27,7 @@ const Safety = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Safety & HSE Program - Petrotek" description="Petrotek's HSE program, stop work authority, and ISNetworld, Avetta, and DISA compliance for wellsite and field operations." path="/safety" />
       <div className="container mx-auto">
         
         <div className="max-w-8xl mx-auto">
@@ -113,7 +115,7 @@ const Safety = () => {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
                 <img 
                   src="/safety.jpg" 
-                  alt="Petrotek Field Operations" 
+                  alt="Man holding a hard hat at his side." 
                 />
               </div>
             </div>

@@ -19,6 +19,7 @@ import {
   Layers,
   Briefcase
 } from 'lucide-react';
+import Seo from '../components/Seo';
 
 /* =========================================================================
    1. NON-HAZARDOUS DATA & CONFIGURATION (Edit this independently)
@@ -890,6 +891,7 @@ const InjectionWells = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Injection Well Services & UIC Permitting - Petrotek" description="Class I, II, III, V and VI injection well feasibility, permitting, well testing, and field operations from a team with decades of UIC experience." path="/injection-wells" />
       <div className="container mx-auto">
         <div className="max-w-8xl mx-auto">
           

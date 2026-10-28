@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -41,6 +42,7 @@ const Leachate = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Landfill Leachate Deep Well Injection | Petrotek" description="Class I deep well injection permitting and support for landfill leachate disposal, including PFAS-impacted leachate." path="/leachate-services" />
       <div className="container mx-auto">
         
         <div className="max-w-8xl mx-auto">

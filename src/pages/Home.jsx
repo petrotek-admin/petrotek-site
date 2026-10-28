@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import ReCAPTCHA from "react-google-recaptcha";
 import OfficeMap from '../components/OfficeMap';
+import Seo from '../components/Seo';
 
 // Custom Oil Derrick Icon - Built to match Lucide's stroke style
 const OilDerrick = ({ className, style }) => (
@@ -346,6 +347,7 @@ const handleFormSubmit = async (e) => {
 
   return (
     <>
+    <Seo title="Petrotek - Injection Well & UIC Permitting Consultants" description="Petrotek Corporation provides injection well, UIC permitting, mining hydrogeology, oil and gas, and carbon capture consulting. Serving clients since 1993." path="/" />
       {/* Hero Section */}
       <header id="home" className="relative flex flex-col justify-between min-h-[100svh] lg:h-screen overflow-hidden bg-gray-900">
         

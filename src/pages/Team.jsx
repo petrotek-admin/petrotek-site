@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   ArrowRight, 
   Users, 
@@ -166,14 +167,6 @@ const OurTeam = () => {
       personal: "In his spare time, he enjoys writing, hunting, and martial arts."
     },
     {
-      name: "Matthew Bourdon, M.S.",
-      role: "Project Geologist",
-      education: "B.S. Geology, University of Massachusetts; M.S. Geology & Geospatial Technologies, University of Texas/University of Massachusetts",
-      tags: ["GIS", "Geological Research", "Log Correlation", "Mapping"],
-      bio: "Matthew holds dual graduate degrees in geology and geospatial tech. He has been using his skills in geological writing and research to help complete Class I-VI well permits and build the company’s geological reference database. Matthew assists with GIS mapping projects and has technical knowledge in wireline logging operations, log interpretation, environmental permitting, and stratigraphic characterization.",
-      personal: "In his spare time, Matthew enjoys hiking, fishing, camping, and traveling with his family."
-    },
-    {
       name: "Michael Kenney, B.S.",
       role: "Wellsite Supervisor/Specialist",
       education: "B.S. Chemical Engineering, Colorado School of Mines",
@@ -201,6 +194,7 @@ const OurTeam = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Our Team - Petrotek Engineers & Geologists" description="Meet Petrotek's petroleum engineers, geologists, hydrogeologists, and field specialists supporting injection well and subsurface projects." path="/team" />
       <div className="container mx-auto max-w-8xl">
         
         {/* Navigation */}

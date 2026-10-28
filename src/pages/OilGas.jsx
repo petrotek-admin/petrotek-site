@@ -1,5 +1,6 @@
 // src/pages/OilGas.jsx
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   ArrowRight, 
   Gavel, 
@@ -64,6 +65,7 @@ const OilGas = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Oil & Gas Engineering and DSU Permitting - Petrotek" description="Upstream E&P support including drill spacing unit permitting, expert testimony, reservoir analysis, and Class II brine disposal wells." path="/oil-and-gas" />
       <div className="container mx-auto">
         
         <div className="max-w-8xl mx-auto">

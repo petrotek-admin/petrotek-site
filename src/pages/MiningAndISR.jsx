@@ -1,5 +1,6 @@
 import React, { useState} from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   ArrowRight, 
   Layers, 
@@ -84,6 +85,7 @@ const MiningAndISR = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Uranium ISR & Mining Hydrogeology - Petrotek" description="Groundwater characterization, modeling, permitting, and wastewater management for uranium in-situ recovery and hard rock mining projects." path="/mining-and-isr" />
       <div className="container mx-auto">
         <div className="max-w-8xl mx-auto">
 
@@ -174,7 +176,7 @@ const MiningAndISR = () => {
                 <div className="lg:w-5/5 sticky top-32">
                   <img 
                     src="/InSitu_Uranium_Recov_2026.png" 
-                    alt="Petrotek Field Operations" 
+                    alt="In-Situ Uranium Recovery Diagram" 
                     className="w-full h-auto object-contain cursor-zoom-in"
                   />
                 </div>
@@ -235,7 +237,7 @@ const MiningAndISR = () => {
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
                     <img 
                       src="/mining.jpg" 
-                      alt="Petrotek Field Operations" 
+                      alt="Dump trucks driving through a mine site." 
                     />
                   </div>
                 </div>

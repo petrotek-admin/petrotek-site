@@ -1,6 +1,7 @@
 // src/pages/CaptureStorage.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   ArrowRight, 
   HelpCircle,
@@ -89,6 +90,7 @@ const CaptureStorage = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Carbon Capture & Storage Class VI Permitting - Petrotek" description="CCS feasibility studies, Class VI UIC permit applications, 45Q support, and geologic sequestration engineering." path="/carbon-capture" />
       <div className="container mx-auto">
         
         <div className="max-w-8xl mx-auto">

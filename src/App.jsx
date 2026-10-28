@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 // Layout & Helpers
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
+import NotFound from './pages/NotFound';
 
 // Page Imports
 import Home from './pages/Home';
@@ -41,6 +42,7 @@ const App = () => {
           <Route path="oil-and-gas" element={<OilGas />} />
           <Route path="mining-and-isr" element={<MiningAndISR />} />
           <Route path="safety" element={<Safety />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </>

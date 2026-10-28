@@ -1,6 +1,7 @@
 // src/pages/Publications.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { 
   ArrowRight, 
   FileText, 
@@ -702,6 +703,7 @@ const Publications = () => {
 
   return (
     <div className="pt-32 pb-20 px-6 bg-white min-h-screen">
+      <Seo title="Technical Library & Publications - Petrotek" description="Conference papers and presentations on injection wells, UIC regulation, well testing, ISR uranium, and Class VI carbon storage." path="/publications" />
       <div className="container mx-auto max-w-8xl">
         <Link to="/" className="flex items-center text-[#972037] font-bold mb-8 hover:underline group w-fit">
           <ArrowRight className="rotate-180 w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Home

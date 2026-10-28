@@ -18,6 +18,8 @@ import CaptureStorage from './pages/CaptureStorage';
 import OilGas from './pages/OilGas';
 import MiningAndISR from './pages/MiningAndISR';
 import Safety from './pages/Safety';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 
 const App = () => {
   return (
@@ -29,6 +31,8 @@ const App = () => {
           <Route index element={<Home />} />
           <Route path="team" element={<Team />} />
           <Route path="publications" element={<Publications />} />
+          <Route path="terms" element={<Terms />} />
+          <Route path="privacy" element={<Privacy />} />
 
           {/* Service Routes */}
           <Route path="injection-wells" element={<InjectionWells />} />

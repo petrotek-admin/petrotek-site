@@ -518,7 +518,11 @@ const Layout = () => {
           </div>
           
           <div className="pt-12 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-            <p className="text-xs md:text-sm uppercase tracking-widest text-gray-400">&copy; {new Date().getFullYear()} Petrotek Corporation</p>
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+              <p className="text-xs md:text-sm uppercase tracking-widest text-gray-400">&copy; {new Date().getFullYear()} Petrotek Corporation</p>
+              <Link to="/privacy" onClick={() => window.scrollTo(0,0)} className="text-xs md:text-sm uppercase tracking-widest text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline">Privacy Policy</Link>
+              <Link to="/terms" onClick={() => window.scrollTo(0,0)} className="text-xs md:text-sm uppercase tracking-widest text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline">Terms of Use</Link>
+            </div>
             <p className="text-xs md:text-sm font-bold text-white uppercase tracking-[0.2em] italic opacity-80">Building Relationships | Solving Problems | Adding Value</p>
           </div>
         </div>
